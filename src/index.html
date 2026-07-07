@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neighborhood Ready</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--hub-bg, #f9fafb); --surface: var(--hub-surface, #fff);
+      --border: var(--hub-border, #e5e7eb); --border-mid: var(--hub-border, #d1d5db);
+      --text: var(--hub-text, #111827); --muted: var(--hub-text-muted, #6b7280);
+      --accent: var(--hub-primary, #ea580c); --accent-hover: var(--hub-primary-hover, #c2410c);
+      --accent-fg: var(--hub-primary-fg, #fff); --radius: var(--hub-radius, 8px);
+      --green: #047857; --green-soft: #d1fae5; --amber: #b45309; --amber-soft: #fef3c7;
+      --red: #b91c1c; --red-soft: #fee2e2; --blue: #1d4ed8; --blue-soft: #dbeafe;
+      --shadow: 0 1px 3px rgba(15,23,42,.07);
+    }
+    body { min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      font-size: var(--hub-font-size, 15px); line-height: 1.5; }
+    .app { max-width: 780px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    h1 { font-size: 1.35rem; } h2 { font-size: 1rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); } .tiny { font-size: .78rem; }
+    .stack { display: grid; gap: 10px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+    .row-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .pill { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: var(--muted); font-size: .72rem; font-weight: 700; }
+    .pill.good { background: var(--green-soft); color: var(--green); }
+    .pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .pill.bad { background: var(--red-soft); color: var(--red); }
+    .pill.info { background: var(--blue-soft); color: var(--blue); }
+    .tabs { display: flex; gap: 4px; background: var(--border); padding: 3px; border-radius: 10px; margin-bottom: 14px; overflow-x: auto; }
+    .tab { flex: 1; border: 0; border-radius: 8px; background: transparent; color: var(--muted); padding: 8px 10px; font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; white-space: nowrap; }
+    .tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 4px 2px 10px; }
+    .section-head h2 { margin-bottom: 0; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; min-height: 38px; background: var(--accent); color: var(--accent-fg); }
+    .btn:hover { background: var(--accent-hover); } .btn:disabled { opacity: .5; cursor: default; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-mid); }
+    .btn-ghost:hover { background: var(--bg); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-sm { min-height: 31px; padding: 5px 9px; font-size: .78rem; }
+    .btn-icon { background: transparent; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 6px; border-radius: 6px; }
+    .btn-icon:hover { background: var(--bg); color: var(--text); }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: .76rem; font-weight: 800; flex-shrink: 0; }
+    .who { display: inline-flex; align-items: center; gap: 7px; }
+    .meta { color: var(--muted); font-size: .8rem; margin-top: 3px; }
+    .banner { border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+    .banner.alert { background: var(--red-soft); border: 1px solid #fecaca; }
+    .banner.alert strong { color: var(--red); }
+    .status-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+    .status-btn { border: 1.5px solid var(--border-mid); border-radius: 8px; padding: 10px; background: var(--surface); font: inherit; font-weight: 700; cursor: pointer; }
+    .status-btn.sel-ok { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+    .status-btn.sel-help { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+    .status-btn.sel-power { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); }
+    .field { display: grid; gap: 4px; margin-bottom: 12px; }
+    .two { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+    label { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 800; }
+    input, textarea, select { width: 100%; border: 1.5px solid var(--border-mid); border-radius: 8px; padding: 9px 11px; font: inherit; background: var(--surface); color: var(--text); }
+    textarea { min-height: 66px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .empty { text-align: center; padding: 34px 16px; color: var(--muted); }
+    .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal { background: var(--surface); border-radius: 12px; padding: 20px; width: 100%; max-width: 440px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 50px rgba(15,23,42,.25); }
+    .modal h3 { margin-bottom: 14px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+    @media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
+  </style>
+  <base href="/run/neighborhood-emergency/">
+</head>
+<body>
+<div class="app"><div id="root" class="empty">Loading…</div></div>
+
+<script type="module">
+import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+
+const CONTEXT = window.__CONTEXT_URL ?? "";
+const DB = window.__DB_URL ?? "";
+const EVENTS_URL = window.__EVENTS_URL ?? "/api/events";
+const APP_ID = window.__APP_ID ?? "neighborhood-emergency";
+const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
+const ADMIN_CONFIG_URL = window.__ADMIN_CONFIG_URL ?? "";
+const IS_ADMIN = window.__IS_ADMIN != null ? !!window.__IS_ADMIN : !CONTEXT;
+
+let members = [], memberMap = new Map(), me = null, groups = [];
+let resources = [], contacts = [], events = [], responses = [];
+let coordinatorGroupId = null;
+let tab = "registry", error = "", modalEl = null;
+
+const STATUSES = [
+  { id: "ok", label: "We're OK ✅", cls: "sel-ok", pill: "good" },
+  { id: "power", label: "No power / water ⚡", cls: "sel-power", pill: "warn" },
+  { id: "help", label: "Need help 🆘", cls: "sel-help", pill: "bad" },
+];
+const statusOf = id => STATUSES.find(s => s.id === id) ?? STATUSES[0];
+
+function nowIso() { return new Date().toISOString(); }
+function uid(p) { return `${p}-${crypto.randomUUID()}`; }
+function canManage() { return isAdult(me); }
+// Mirrors the hub's require_group_setting for notifications: a member may broadcast
+// a storm check-in iff they are a hub admin, or the coordinator group is configured
+// AND they belong to it. No "all adults" fallback — matches server enforcement.
+function isCoordinator() {
+  if (IS_ADMIN) return true;
+  if (!coordinatorGroupId || !me) return false;
+  const g = groups.find(x => x.id === coordinatorGroupId);
+  return !!g && (g.memberIds ?? []).includes(me.id);
+}
+
+async function db(sql, params = []) {
+  if (!DB) return { rows: [] };
+  const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+async function loadMembers() {
+  if (!CONTEXT) {
+    members = [
+      { id: "demo-1", name: "Maria", role: "adult" },
+      { id: "demo-2", name: "Devon", role: "adult" },
+      { id: "demo-3", name: "Priya", role: "adult" },
+      { id: "demo-4", name: "Theo", role: "child" },
+    ];
+    groups = [{ id: "demo-coord", name: "Block Coordinators", memberIds: ["demo-1", "demo-2"] }];
+  } else {
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
+      const data = await res.json();
+      members = data["family.members"] ?? [];
+      groups = data["family.groups"] ?? [];
+    } catch { members = []; groups = []; }
+  }
+  memberMap = new Map(members.map(m => [m.id, m]));
+  me = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
+}
+
+function seedDemo() {
+  resources = [
+    { id: "r1", member_id: "demo-1", member_name: "Maria", kind: "equipment", label: "Portable generator", detail: "5000W, plus extra fuel", visibility: "everyone", created_at: nowIso() },
+    { id: "r2", member_id: "demo-2", member_name: "Devon", kind: "skill", label: "EMT / first aid", detail: "Certified, has a full trauma kit", visibility: "everyone", created_at: nowIso() },
+    { id: "r3", member_id: "demo-3", member_name: "Priya", kind: "equipment", label: "Chainsaw + truck", detail: "Can help clear downed trees", visibility: "everyone", created_at: nowIso() },
+  ];
+  contacts = [
+    { id: "c1", name: "Maria Alvarez", role: "Block captain — North", phone: "555-0101", area: "Houses 1–20", notes: "", sort_order: 0, created_at: nowIso() },
+    { id: "c2", name: "Devon Clark", role: "Coordinator", phone: "555-0102", area: "Whole neighborhood", notes: "Calls 911 relay", sort_order: 1, created_at: nowIso() },
+  ];
+  events = [];
+  responses = [];
+  coordinatorGroupId = "demo-coord";
+}
+
+async function loadData() {
+  if (!DB) { seedDemo(); return; }
+  const [r, c, e, rs, st] = await Promise.all([
+    db("SELECT * FROM app_neighborhood_emergency__resources ORDER BY kind ASC, created_at ASC"),
+    db("SELECT * FROM app_neighborhood_emergency__contacts ORDER BY sort_order ASC, created_at ASC"),
+    db("SELECT * FROM app_neighborhood_emergency__checkin_events ORDER BY created_at DESC"),
+    db("SELECT * FROM app_neighborhood_emergency__checkin_responses ORDER BY responded_at ASC"),
+    db("SELECT key, value FROM app_neighborhood_emergency__settings WHERE key = 'coordinator_group_id'"),
+  ]);
+  resources = r.rows; contacts = c.rows; events = e.rows; responses = rs.rows;
+  coordinatorGroupId = st.rows[0]?.value || null;
+}
+
+async function saveSetting(key, value) {
+  if (!ADMIN_CONFIG_URL) { coordinatorGroupId = value || null; return; }
+  const res = await fetch(ADMIN_CONFIG_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, value }) });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Save failed");
+}
+
+function settingsModal() {
+  const opts = groups.map(g => `<option value="${esc(g.id)}" ${coordinatorGroupId === g.id ? "selected" : ""}>${esc(g.name)}</option>`).join("");
+  openModal(`
+    <h3>Storm-mode coordinators</h3>
+    <p class="muted tiny" style="margin-bottom:12px">Choose the hub group whose members may broadcast "are you OK?" check-ins to the whole neighborhood. Until one is set, only a hub admin can broadcast.</p>
+    <form class="form" id="settings-form">
+      <div class="field"><label for="set-group">Coordinator group</label>
+        <select id="set-group">${groups.length ? `<option value="">— None (admins only) —</option>${opts}` : `<option value="">No hub groups exist yet</option>`}</select></div>
+      ${groups.length ? "" : `<p class="tiny" style="color:var(--amber)">Create a group in the hub's family/group settings first, then return here.</p>`}
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">Save</button></div>
+    </form>`);
+}
+async function submitSettings(form) {
+  const groupId = form["set-group"].value;
+  const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
+  try { await saveSetting("coordinator_group_id", groupId); coordinatorGroupId = groupId || null; closeModal(); render(); }
+  catch (e) { btn.disabled = false; btn.textContent = "Save"; showError(e.message); }
+}
+
+async function init() {
+  try { await Promise.all([loadMembers(), loadData()]); render(); }
+  catch (e) { error = e.message; render(); }
+}
+
+function publish(type, payload) {
+  fetch(EVENTS_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ source_app_id: APP_ID, type, payload }) }).catch(() => {});
+}
+function showError(msg) { error = msg; render(); }
+function avatar(id, name) { return `<span class="avatar" style="background:${esc(memberColor(id, members))}">${esc(initial(name))}</span>`; }
+
+/* ── modal ── */
+function openModal(html) {
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.className = "modal-backdrop";
+  modalEl.innerHTML = `<div class="modal">${html}</div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+  const f = modalEl.querySelector("[data-autofocus]"); if (f) f.focus();
+}
+function closeModal() { modalEl?.remove(); modalEl = null; }
+
+/* ── resources ── */
+function resourceModal() {
+  openModal(`
+    <h3>Add what you can offer</h3>
+    <form class="form" id="res-form">
+      <div class="field"><label for="r-kind">Type</label><select id="r-kind"><option value="equipment">Equipment</option><option value="skill">Skill / training</option></select></div>
+      <div class="field"><label for="r-label">What is it?</label><input id="r-label" data-autofocus placeholder="e.g. Generator, chainsaw, CPR certified"></div>
+      <div class="field"><label for="r-detail">Details</label><textarea id="r-detail" placeholder="Anything neighbors should know before they call"></textarea></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">Add to registry</button></div>
+    </form>`);
+}
+async function submitResource(form) {
+  const label = form["r-label"].value.trim(); if (!label) { form["r-label"].focus(); return; }
+  const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
+  const row = { id: uid("r"), member_id: me.id, member_name: me.name, kind: form["r-kind"].value, label, detail: form["r-detail"].value.trim(), visibility: "everyone", created_at: nowIso() };
+  try {
+    if (DB) await db("INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?,?,?,?,?,?,?,?)",
+      [row.id, row.member_id, row.member_name, row.kind, row.label, row.detail, row.visibility, row.created_at]);
+    resources = [...resources, row]; closeModal(); render();
+  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; showError(e.message); }
+}
+async function deleteResource(id) {
+  if (!(await hubConfirm({ message: "Remove this from the registry?", destructive: true, confirmLabel: "Remove" }))) return;
+  try { if (DB) await db("DELETE FROM app_neighborhood_emergency__resources WHERE id=?", [id]); resources = resources.filter(x => x.id !== id); render(); }
+  catch (e) { showError(e.message); }
+}
+
+/* ── contacts (phone tree) ── */
+function contactModal(id) {
+  const c = id ? contacts.find(x => x.id === id) : null;
+  openModal(`
+    <h3>${c ? "Edit contact" : "Add to phone tree"}</h3>
+    <form class="form" id="con-form" data-id="${c ? esc(c.id) : ""}">
+      <div class="field"><label for="c-name">Name</label><input id="c-name" data-autofocus value="${c ? esc(c.name) : ""}"></div>
+      <div class="two">
+        <div class="field"><label for="c-role">Role</label><input id="c-role" placeholder="Block captain, coordinator" value="${c ? esc(c.role) : ""}"></div>
+        <div class="field"><label for="c-phone">Phone</label><input id="c-phone" value="${c ? esc(c.phone) : ""}"></div>
+      </div>
+      <div class="field"><label for="c-area">Area covered</label><input id="c-area" placeholder="Houses 1–20, whole block" value="${c ? esc(c.area) : ""}"></div>
+      <div class="field"><label for="c-notes">Notes</label><input id="c-notes" value="${c ? esc(c.notes) : ""}"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">${c ? "Save" : "Add"}</button></div>
+    </form>`);
+}
+async function submitContact(form) {
+  const name = form["c-name"].value.trim(); if (!name) { form["c-name"].focus(); return; }
+  const id = form.dataset.id;
+  const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
+  const vals = { name, role: form["c-role"].value.trim(), phone: form["c-phone"].value.trim(), area: form["c-area"].value.trim(), notes: form["c-notes"].value.trim() };
+  try {
+    if (id) {
+      const c = contacts.find(x => x.id === id);
+      if (DB) await db("UPDATE app_neighborhood_emergency__contacts SET name=?, role=?, phone=?, area=?, notes=? WHERE id=?", [vals.name, vals.role, vals.phone, vals.area, vals.notes, id]);
+      Object.assign(c, vals);
+    } else {
+      const row = { id: uid("c"), ...vals, sort_order: contacts.length, created_at: nowIso() };
+      if (DB) await db("INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        [row.id, row.name, row.role, row.phone, row.area, row.notes, row.sort_order, row.created_at]);
+      contacts = [...contacts, row];
+    }
+    closeModal(); render();
+  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; showError(e.message); }
+}
+async function deleteContact(id) {
+  if (!(await hubConfirm({ message: "Remove this contact?", destructive: true, confirmLabel: "Remove" }))) return;
+  try { if (DB) await db("DELETE FROM app_neighborhood_emergency__contacts WHERE id=?", [id]); contacts = contacts.filter(x => x.id !== id); render(); }
+  catch (e) { showError(e.message); }
+}
+
+/* ── storm mode ── */
+function activeEvent() { return events.find(e => e.active); }
+function stormModal() {
+  openModal(`
+    <h3>Start a storm check-in</h3>
+    <p class="muted tiny" style="margin-bottom:12px">Everyone gets a notification asking if they're OK.</p>
+    <form class="form" id="storm-form">
+      <div class="field"><label for="s-title">Headline</label><input id="s-title" data-autofocus value="Storm check-in" placeholder="e.g. Ice storm — everyone OK?"></div>
+      <div class="field"><label for="s-msg">Message</label><textarea id="s-msg" placeholder="Tap to tell us how you're doing.">Tap to tell us how you're doing.</textarea></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-danger">Broadcast</button></div>
+    </form>`);
+}
+async function submitStorm(form) {
+  const title = form["s-title"].value.trim() || "Storm check-in";
+  const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Broadcasting…";
+  const row = { id: uid("e"), title, message: form["s-msg"].value.trim(), active: 1, created_by: me.id, created_by_name: me.name, created_at: nowIso(), closed_at: "" };
+  try {
+    if (DB) await db("INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at, closed_at) VALUES (?,?,?,?,?,?,?,?)",
+      [row.id, row.title, row.message, 1, row.created_by, row.created_by_name, row.created_at, ""]);
+    events = [row, ...events]; closeModal(); render();
+    publish("emergency.storm_activated", { event_id: row.id, title: row.title });
+    sendHubNotification({ title: `🚨 ${row.title}`, body: row.message || "Tap to check in — are you OK?", url: hubAppUrl(APP_ID, { eventId: row.id }) }).catch(() => {});
+  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; showError(e.message); }
+}
+async function closeStorm(id) {
+  if (!(await hubConfirm({ message: "Close this check-in?", description: "Responses are kept for the record.", confirmLabel: "Close" }))) return;
+  try {
+    if (DB) await db("UPDATE app_neighborhood_emergency__checkin_events SET active=0, closed_at=? WHERE id=?", [nowIso(), id]);
+    const e = events.find(x => x.id === id); if (e) { e.active = 0; e.closed_at = nowIso(); } render();
+  } catch (e) { showError(e.message); }
+}
+function myResponse(eventId) { return responses.find(r => r.event_id === eventId && r.member_id === me?.id) ?? null; }
+async function respond(eventId, status) {
+  if (!me) return;
+  const existing = myResponse(eventId);
+  try {
+    if (existing) {
+      if (DB) await db("UPDATE app_neighborhood_emergency__checkin_responses SET status=?, responded_at=? WHERE id=?", [status, nowIso(), existing.id]);
+      existing.status = status; existing.responded_at = nowIso();
+    } else {
+      const row = { id: uid("rs"), event_id: eventId, member_id: me.id, member_name: me.name, status, note: "", responded_at: nowIso() };
+      if (DB) await db("INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?,?,?,?,?,?,?)",
+        [row.id, row.event_id, row.member_id, row.member_name, row.status, row.note, row.responded_at]);
+      responses = [...responses, row];
+    }
+    render();
+    publish("emergency.checkin_responded", { event_id: eventId, status });
+  } catch (e) { showError(e.message); }
+}
+
+/* ── render ── */
+function renderRegistry() {
+  const groups = [
+    { kind: "equipment", label: "Equipment" },
+    { kind: "skill", label: "Skills & training" },
+  ];
+  return `
+    <div class="section-head"><h2>Who has what</h2>${me ? `<button class="btn btn-sm" data-add="res">Offer something</button>` : ""}</div>
+    ${groups.map(g => {
+      const items = resources.filter(r => r.kind === g.kind);
+      return `<h2 class="muted tiny" style="text-transform:uppercase;letter-spacing:.05em;margin:12px 2px 8px">${g.label}</h2>
+        <div class="stack">${items.length ? items.map(r => `
+          <div class="card row-card">
+            <div>
+              <div class="who">${avatar(r.member_id, r.member_name)}<strong>${esc(r.label)}</strong></div>
+              <div class="meta">${esc(r.member_name)}${r.detail ? ` — ${esc(r.detail)}` : ""}</div>
+            </div>
+            ${(r.member_id === me?.id) ? `<button class="btn-icon" title="Remove" data-del-res="${esc(r.id)}">🗑️</button>` : ""}
+          </div>`).join("") : `<div class="card empty tiny">Nothing listed yet.</div>`}</div>`;
+    }).join("")}`;
+}
+
+function renderPhoneTree() {
+  return `
+    <div class="section-head"><h2>Phone tree</h2>${canManage() ? `<button class="btn btn-sm" data-add="con">Add contact</button>` : ""}</div>
+    <div class="stack">
+      ${contacts.length ? contacts.map(c => `
+        <div class="card row-card">
+          <div>
+            <strong>${esc(c.name)}</strong>${c.role ? ` <span class="pill info">${esc(c.role)}</span>` : ""}
+            <div class="meta">${c.phone ? `📞 <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : ""}${c.area ? ` · ${esc(c.area)}` : ""}</div>
+            ${c.notes ? `<div class="meta">${esc(c.notes)}</div>` : ""}
+          </div>
+          ${canManage() ? `<div style="display:flex;gap:2px"><button class="btn-icon" title="Edit" data-edit-con="${esc(c.id)}">✏️</button><button class="btn-icon" title="Remove" data-del-con="${esc(c.id)}">🗑️</button></div>` : ""}
+        </div>`).join("") : `<div class="card empty">No contacts yet.</div>`}
+    </div>`;
+}
+
+function renderStorm() {
+  const active = activeEvent();
+  let html = `<div class="section-head"><h2>Storm mode</h2><div style="display:flex;gap:6px">
+    ${IS_ADMIN ? `<button class="btn btn-ghost btn-sm" data-settings>⚙️ Coordinators</button>` : ""}
+    ${isCoordinator() && !active ? `<button class="btn btn-danger btn-sm" data-add="storm">Start check-in</button>` : ""}
+  </div></div>`;
+  if (active) {
+    const rs = responses.filter(r => r.event_id === active.id);
+    const mine = myResponse(active.id);
+    const counts = STATUSES.map(s => ({ s, n: rs.filter(r => r.status === s.id).length }));
+    html += `
+      <div class="banner alert">
+        <strong>🚨 ${esc(active.title)}</strong>
+        ${active.message ? `<div class="meta" style="color:inherit">${esc(active.message)}</div>` : ""}
+        <div style="margin:12px 0 6px" class="tiny muted">How are you doing?</div>
+        <div class="status-grid">
+          ${STATUSES.map(s => `<button class="status-btn ${mine?.status === s.id ? s.cls : ""}" data-respond="${active.id}" data-status="${s.id}">${esc(s.label)}</button>`).join("")}
+        </div>
+        ${mine ? `<div class="tiny" style="margin-top:8px">You checked in as “${esc(statusOf(mine.status).label)}”. Tap to change.</div>` : ""}
+      </div>
+      <div class="card stack">
+        <div class="who" style="justify-content:space-between">
+          <strong>Check-in board</strong>
+          ${isCoordinator() ? `<button class="btn btn-ghost btn-sm" data-close-storm="${esc(active.id)}">Close check-in</button>` : ""}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${counts.map(c => `<span class="pill ${c.s.pill}">${esc(c.s.label.replace(/[^\w\s'/]/g, "").trim())}: ${c.n}</span>`).join("")}</div>
+        ${rs.length ? rs.map(r => `<div class="row-card"><div class="who">${avatar(r.member_id, r.member_name)}<span>${esc(r.member_name)}</span></div><span class="pill ${statusOf(r.status).pill}">${esc(statusOf(r.status).label.replace(/[^\w\s'/]/g, "").trim())}</span></div>`).join("") : `<div class="tiny muted">No responses yet.</div>`}
+        ${!canManage() ? `<div class="tiny muted">Coordinators and adults see everyone's status; you see your own.</div>` : ""}
+      </div>`;
+  } else {
+    const past = events.filter(e => !e.active);
+    html += `<div class="card empty">No active check-in. ${isCoordinator() ? "Start one when severe weather hits." : "You'll get a notification if a coordinator starts one."}</div>`;
+    if (past.length) html += `<h2 class="muted tiny" style="margin:14px 2px 8px">Past check-ins</h2><div class="stack">${past.map(e => `<div class="card row-card"><div><strong>${esc(e.title)}</strong><div class="meta">${esc(formatRelativeDate(e.created_at))} · ${responses.filter(r => r.event_id === e.id).length} responses</div></div></div>`).join("")}</div>`;
+  }
+  return html;
+}
+
+const TABS = [
+  { id: "registry", label: "Registry" },
+  { id: "phone", label: "Phone Tree" },
+  { id: "storm", label: "Storm Mode" },
+];
+
+function render() {
+  const root = document.getElementById("root");
+  root.className = "";
+  const body = tab === "registry" ? renderRegistry() : tab === "phone" ? renderPhoneTree() : renderStorm();
+  root.innerHTML = `
+    <div class="topbar"><div><h1>🚨 Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
+    ${error ? `<div class="error">${esc(error)}</div>` : ""}
+    <div class="tabs">${TABS.map(t => `<button class="tab ${tab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}</div>
+    ${body}`;
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, [data-tab], a");
+  if (!t) return;
+  if (t.dataset.tab) { tab = t.dataset.tab; error = ""; render(); return; }
+  if (t.dataset.close !== undefined) { closeModal(); return; }
+  const add = t.dataset.add;
+  if (add === "res") return resourceModal();
+  if (add === "con") return contactModal();
+  if (add === "storm") return stormModal();
+  if (t.dataset.settings !== undefined) return settingsModal();
+  if (t.dataset.editCon) return contactModal(t.dataset.editCon);
+  if (t.dataset.delRes) return deleteResource(t.dataset.delRes);
+  if (t.dataset.delCon) return deleteContact(t.dataset.delCon);
+  if (t.dataset.closeStorm) return closeStorm(t.dataset.closeStorm);
+  if (t.dataset.respond) return respond(t.dataset.respond, t.dataset.status);
+});
+
+document.addEventListener("submit", e => {
+  e.preventDefault();
+  const id = e.target.id;
+  if (id === "res-form") submitResource(e.target);
+  else if (id === "con-form") submitContact(e.target);
+  else if (id === "storm-form") submitStorm(e.target);
+  else if (id === "settings-form") submitSettings(e.target);
+});
+
+function handleDeepLink() {
+  const eventId = new URLSearchParams(location.search).get("eventId");
+  if (eventId && events.some(e => e.id === eventId)) tab = "storm";
+}
+
+(async () => { await init(); handleDeepLink(); render(); })();
+</script>
+</body>
+</html>

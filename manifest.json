@@ -1,0 +1,63 @@
+{
+  "id": "neighborhood-emergency",
+  "name": "Neighborhood Ready",
+  "version": "1.0.0",
+  "description": "Community emergency preparedness: a skills-and-equipment registry (who has a generator, a chainsaw, medical training), a phone tree of block captains, and a storm-mode \"are you OK?\" check-in broadcast.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "icon": "🚨",
+  "category": "community",
+  "tags": ["emergency", "preparedness", "neighborhood", "hoa", "community", "safety"],
+  "storage": "db",
+  "db_plaintext_columns": ["visibility", "kind"],
+  "data_access": {
+    "reads": ["family.members", "family.groups"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "row_policies": {
+    "settings": { "kind": "app_config" },
+    "resources": {
+      "kind": "owner_or_visibility",
+      "member_column": "member_id",
+      "visibility_column": "visibility",
+      "everyone_values": ["everyone"],
+      "write_owner_only": true
+    },
+    "contacts": { "kind": "adult_writable" },
+    "checkin_events": { "kind": "adult_writable" },
+    "checkin_responses": {
+      "kind": "owner_only",
+      "member_column": "member_id",
+      "adults_bypass": true,
+      "unique_per_member": {
+        "member_column": "member_id",
+        "scope_columns": ["event_id"]
+      }
+    }
+  },
+  "publishes": ["emergency.storm_activated", "emergency.checkin_responded"],
+  "admin_config": {
+    "settings_table": "settings",
+    "keys": ["coordinator_group_id"]
+  },
+  "notification_acls": {
+    "send": {
+      "require_group_setting": { "settings_table": "settings", "settings_key": "coordinator_group_id" }
+    }
+  },
+  "nav": { "label": "Emergency" },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT COUNT(*) AS n FROM app_neighborhood_emergency__checkin_events WHERE active = 1 LIMIT 1"
+    },
+    "display": { "template": "badge", "count": "n", "label": "storm check-in active", "severity": "alert" }
+  },
+  "resource_limits": {
+    "max_db_bytes": 26214400
+  }
+}

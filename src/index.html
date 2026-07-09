@@ -76,6 +76,10 @@
 
 <script type="module">
 import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+import {
+  STATUSES, statusOf, isCoordinator as isCoordinatorOf,
+  activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind,
+} from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
@@ -90,25 +94,10 @@ let resources = [], contacts = [], events = [], responses = [];
 let coordinatorGroupId = null;
 let tab = "registry", error = "", modalEl = null;
 
-const STATUSES = [
-  { id: "ok", label: "We're OK ✅", cls: "sel-ok", pill: "good" },
-  { id: "power", label: "No power / water ⚡", cls: "sel-power", pill: "warn" },
-  { id: "help", label: "Need help 🆘", cls: "sel-help", pill: "bad" },
-];
-const statusOf = id => STATUSES.find(s => s.id === id) ?? STATUSES[0];
-
 function nowIso() { return new Date().toISOString(); }
 function uid(p) { return `${p}-${crypto.randomUUID()}`; }
 function canManage() { return isAdult(me); }
-// Mirrors the hub's require_group_setting for notifications: a member may broadcast
-// a storm check-in iff they are a hub admin, or the coordinator group is configured
-// AND they belong to it. No "all adults" fallback — matches server enforcement.
-function isCoordinator() {
-  if (IS_ADMIN) return true;
-  if (!coordinatorGroupId || !me) return false;
-  const g = groups.find(x => x.id === coordinatorGroupId);
-  return !!g && (g.memberIds ?? []).includes(me.id);
-}
+function isCoordinator() { return isCoordinatorOf(me, IS_ADMIN, coordinatorGroupId, groups); }
 
 async function db(sql, params = []) {
   if (!DB) return { rows: [] };
@@ -284,7 +273,7 @@ async function deleteContact(id) {
 }
 
 /* ── storm mode ── */
-function activeEvent() { return events.find(e => e.active); }
+function activeEvent() { return activeEventOf(events); }
 function stormModal() {
   openModal(`
     <h3>Start a storm check-in</h3>
@@ -314,7 +303,7 @@ async function closeStorm(id) {
     const e = events.find(x => x.id === id); if (e) { e.active = 0; e.closed_at = nowIso(); } render();
   } catch (e) { showError(e.message); }
 }
-function myResponse(eventId) { return responses.find(r => r.event_id === eventId && r.member_id === me?.id) ?? null; }
+function myResponse(eventId) { return myResponseOf(responses, eventId, me?.id); }
 async function respond(eventId, status) {
   if (!me) return;
   const existing = myResponse(eventId);
@@ -342,7 +331,7 @@ function renderRegistry() {
   return `
     <div class="section-head"><h2>Who has what</h2>${me ? `<button class="btn btn-sm" data-add="res">Offer something</button>` : ""}</div>
     ${groups.map(g => {
-      const items = resources.filter(r => r.kind === g.kind);
+      const items = resourcesByKind(resources, g.kind);
       return `<h2 class="muted tiny" style="text-transform:uppercase;letter-spacing:.05em;margin:12px 2px 8px">${g.label}</h2>
         <div class="stack">${items.length ? items.map(r => `
           <div class="card row-card">
@@ -380,7 +369,7 @@ function renderStorm() {
   if (active) {
     const rs = responses.filter(r => r.event_id === active.id);
     const mine = myResponse(active.id);
-    const counts = STATUSES.map(s => ({ s, n: rs.filter(r => r.status === s.id).length }));
+    const counts = countStatuses(responses, active.id);
     html += `
       <div class="banner alert">
         <strong>🚨 ${esc(active.title)}</strong>

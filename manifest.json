@@ -1,7 +1,7 @@
 {
   "id": "neighborhood-emergency",
   "name": "Neighborhood Ready",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Community emergency preparedness: a skills-and-equipment registry (who has a generator, a chainsaw, medical training), a phone tree of block captains, and a storm-mode \"are you OK?\" check-in broadcast.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -28,14 +28,23 @@
       "write_owner_only": true
     },
     "contacts": { "kind": "adult_writable" },
-    "checkin_events": { "kind": "adult_writable" },
+    "checkin_events": {
+      "kind": "adult_writable",
+      "retain_days": {
+        "default": 90,
+        "timestamp_column": "created_at",
+        "override_key": "checkin_history",
+        "dependent_tables": [{ "table": "checkin_responses", "foreign_key": "event_id" }]
+      }
+    },
     "checkin_responses": {
       "kind": "owner_only",
       "member_column": "member_id",
       "adults_bypass": true,
-      "unique_per_member": {
+      "max_per_member": {
         "member_column": "member_id",
-        "scope_columns": ["event_id"]
+        "scope_columns": ["event_id"],
+        "limit": 1
       }
     }
   },

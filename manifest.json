@@ -10,6 +10,7 @@
   "tags": ["emergency", "preparedness", "neighborhood", "hoa", "community", "safety"],
   "storage": "db",
   "db_plaintext_columns": ["visibility", "kind"],
+  "contexts": ["household", "shared_space"],
   "data_access": {
     "reads": ["family.members", "family.groups"],
     "writes": []

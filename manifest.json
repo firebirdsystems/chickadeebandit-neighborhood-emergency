@@ -30,7 +30,18 @@
     },
     "contacts": { "kind": "adult_writable" },
     "checkin_events": {
-      "kind": "adult_writable",
+      "kind": "owner_or_visibility",
+      "member_column": "created_by",
+      "visibility_column": "visibility",
+      "everyone_values": ["everyone"],
+      "write_privileged_only": true,
+      "privileged_groups": [
+        {
+          "settings_table": "settings",
+          "settings_key": "coordinator_group_id",
+          "actions": ["select", "insert", "update", "delete"]
+        }
+      ],
       "retain_days": {
         "default": 90,
         "timestamp_column": "created_at",
@@ -50,6 +61,17 @@
     }
   },
   "publishes": ["emergency.storm_activated", "emergency.checkin_responded"],
+  "publish_acls": {
+    "emergency.storm_activated": {
+      "require_group_setting": { "settings_table": "settings", "settings_key": "coordinator_group_id" }
+    },
+    "emergency.checkin_responded": { "require_role": "member" }
+  },
+  "member_references": {
+    "resources": { "column": "member_id", "on_removed": "delete" },
+    "checkin_events": { "column": "created_by", "on_removed": "keep" },
+    "checkin_responses": { "column": "member_id", "on_removed": "delete" }
+  },
   "admin_config": {
     "settings_table": "settings",
     "keys": ["coordinator_group_id"]

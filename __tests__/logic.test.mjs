@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  STATUSES, statusOf, isCoordinator, activeEvent, myResponse, resourcesByKind, countStatuses,
+  STATUSES, statusOf, isCoordinator, activeEvent, myResponse, resourcesByKind, countStatuses, searchableFields,
 } from "../src/logic.js";
 
 describe("statusOf", () => {
@@ -61,5 +61,13 @@ describe("countStatuses", () => {
   it("counts each status for an event", () => {
     const counts = countStatuses(responses, "e1");
     expect(counts.map(c => c.n)).toEqual([2, 0, 1]); // ok, power, help
+  });
+});
+
+describe("searchableFields", () => {
+  it("matches on role and area — how a phone tree is actually used", () => {
+    const fields = searchableFields({ name: "Jo Diaz", role: "Gas emergency", area: "North block", phone: "0800 111222", notes: "" });
+    expect(fields).toContain("Gas emergency");
+    expect(fields).toContain("North block");
   });
 });

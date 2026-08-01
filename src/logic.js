@@ -37,3 +37,13 @@ export function countStatuses(responses, eventId) {
   const rs = responses.filter(r => r.event_id === eventId);
   return STATUSES.map(s => ({ s, n: rs.filter(r => r.status === s.id).length }));
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * Role and area count as well as the name — in an emergency the
+ * phone tree is searched for "the gas people" or "north block", not for
+ * somebody's surname.
+ */
+export function searchableFields(item) {
+  return [item.name, item.role, item.area, item.phone, item.notes];
+}

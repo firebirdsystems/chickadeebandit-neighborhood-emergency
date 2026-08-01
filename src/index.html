@@ -68,6 +68,13 @@
     .modal h3 { margin-bottom: 14px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
     @media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
+    .search-row { margin-bottom: 12px; }
+    .search-input {
+      width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
+      border-radius: 8px; padding: 9px 11px; font: inherit;
+      background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
+    }
+    .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
   </style>
   <base href="/run/neighborhood-emergency/">
 </head>
@@ -75,10 +82,10 @@
 <div class="app"><div id="root" class="empty">Loading…</div></div>
 
 <script type="module">
-import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl, searchMatch } from "/hub-sdk.js";
 import {
   STATUSES, statusOf, isCoordinator as isCoordinatorOf,
-  activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind,
+  activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind, searchableFields,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -93,6 +100,7 @@ let members = [], memberMap = new Map(), me = null, groups = [];
 let resources = [], contacts = [], events = [], responses = [];
 let coordinatorGroupId = null;
 let tab = "registry", error = "", modalEl = null;
+let searchQ = "";       // in-app search (see logic.js searchableFields)
 
 function nowIso() { return new Date().toISOString(); }
 function uid(p) { return `${p}-${crypto.randomUUID()}`; }
@@ -345,10 +353,12 @@ function renderRegistry() {
 }
 
 function renderPhoneTree() {
+  const shown = searchQ ? contacts.filter(c => searchMatch(searchQ, searchableFields(c))) : contacts;
   return `
     <div class="section-head"><h2>Phone tree</h2>${canManage() ? `<button class="btn btn-sm" data-add="con">Add contact</button>` : ""}</div>
+    ${contacts.length ? `<div class="search-row"><input id="search" class="search-input" type="search" placeholder="Search the phone tree…" aria-label="Search the phone tree" value="${esc(searchQ)}" /></div>` : ""}
     <div class="stack">
-      ${contacts.length ? contacts.map(c => `
+      ${shown.length ? shown.map(c => `
         <div class="card row-card">
           <div>
             <strong>${esc(c.name)}</strong>${c.role ? ` <span class="pill info">${esc(c.role)}</span>` : ""}
@@ -356,7 +366,7 @@ function renderPhoneTree() {
             ${c.notes ? `<div class="meta">${esc(c.notes)}</div>` : ""}
           </div>
           ${canManage() ? `<div style="display:flex;gap:2px"><button class="btn-icon" title="Edit" data-edit-con="${esc(c.id)}">✏️</button><button class="btn-icon" title="Remove" data-del-con="${esc(c.id)}">🗑️</button></div>` : ""}
-        </div>`).join("") : `<div class="card empty">No contacts yet.</div>`}
+        </div>`).join("") : `<div class="card empty">${searchQ ? `No contacts match "${esc(searchQ)}".` : "No contacts yet."}</div>`}
     </div>`;
 }
 
@@ -402,6 +412,16 @@ const TABS = [
   { id: "phone", label: "Phone Tree" },
   { id: "storm", label: "Storm Mode" },
 ];
+
+// render() rewrites the whole shell, so put the caret back after typing.
+document.addEventListener("input", (e) => {
+  if (e.target.id !== "search") return;
+  searchQ = e.target.value;
+  const caret = e.target.selectionStart;
+  render();
+  const next = document.getElementById("search");
+  if (next) { next.focus(); next.setSelectionRange(caret, caret); }
+});
 
 function render() {
   const root = document.getElementById("root");

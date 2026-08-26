@@ -9,6 +9,13 @@
   "category": "community",
   "tags": ["emergency", "preparedness", "neighborhood", "hoa", "community", "safety"],
   "storage": "db",
+  "preload": {
+    "resources": {"sql": "SELECT * FROM app_neighborhood_emergency__resources ORDER BY kind ASC, created_at ASC"},
+    "contacts": {"sql": "SELECT * FROM app_neighborhood_emergency__contacts ORDER BY sort_order ASC, created_at ASC"},
+    "checkin_events": {"sql": "SELECT * FROM app_neighborhood_emergency__checkin_events ORDER BY created_at DESC"},
+    "checkin_responses": {"sql": "SELECT * FROM app_neighborhood_emergency__checkin_responses ORDER BY responded_at ASC"},
+    "settings": {"sql": "SELECT key, value FROM app_neighborhood_emergency__settings WHERE key = 'coordinator_group_id'"}
+  },
   "db_plaintext_columns": ["visibility", "kind"],
   "contexts": ["household", "shared_space"],
   "data_access": {

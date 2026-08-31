@@ -390,13 +390,13 @@ function renderStorm() {
         </div>
         ${mine ? `<div class="tiny" style="margin-top:8px">You checked in as “${esc(statusOf(mine.status).label)}”. Tap to change.</div>` : ""}
       </div>
-      <div class="card stack">
+      <div class="card stack" data-testid="checkin-board" data-event-id="${esc(active.id)}">
         <div class="who" style="justify-content:space-between">
           <strong>Check-in board</strong>
           ${isCoordinator() ? `<button class="btn btn-ghost btn-sm" data-close-storm="${esc(active.id)}">Close check-in</button>` : ""}
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">${counts.map(c => `<span class="pill ${c.s.pill}">${esc(c.s.label.replace(/[^\w\s'/]/g, "").trim())}: ${c.n}</span>`).join("")}</div>
-        ${rs.length ? rs.map(r => `<div class="row-card"><div class="who">${avatar(r.member_id, r.member_name)}<span>${esc(r.member_name)}</span></div><span class="pill ${statusOf(r.status).pill}">${esc(statusOf(r.status).label.replace(/[^\w\s'/]/g, "").trim())}</span></div>`).join("") : `<div class="tiny muted">No responses yet.</div>`}
+        <div style="display:flex;gap:8px;flex-wrap:wrap" data-testid="status-tally">${counts.map(c => `<span class="pill ${c.s.pill}" data-testid="tally-pill" data-status="${esc(c.s.id)}">${esc(c.s.label.replace(/[^\w\s'/]/g, "").trim())}: ${c.n}</span>`).join("")}</div>
+        ${rs.length ? rs.map(r => `<div class="row-card" data-testid="checkin-row" data-response-id="${esc(r.id)}"><div class="who">${avatar(r.member_id, r.member_name)}<span>${esc(r.member_name)}</span></div><span class="pill ${statusOf(r.status).pill}">${esc(statusOf(r.status).label.replace(/[^\w\s'/]/g, "").trim())}</span></div>`).join("") : `<div class="tiny muted">No responses yet.</div>`}
         ${!canManage() ? `<div class="tiny muted">Coordinators and adults see everyone's status; you see your own.</div>` : ""}
       </div>`;
   } else {
@@ -430,7 +430,7 @@ function render() {
   root.innerHTML = `
     <div class="topbar"><div><h1>🚨 Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
     ${error ? `<div class="error">${esc(error)}</div>` : ""}
-    <div class="tabs">${TABS.map(t => `<button class="tab ${tab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}</div>
+    <div class="tabs">${TABS.map(t => `<button class="tab ${tab === t.id ? "active" : ""}" data-testid="app-tab" data-tab="${t.id}">${t.label}</button>`).join("")}</div>
     ${body}`;
 }
 

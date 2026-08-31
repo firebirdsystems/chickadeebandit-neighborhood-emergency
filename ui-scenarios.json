@@ -1,0 +1,116 @@
+{
+  "scenarios": [
+    {
+      "name": "a child's check-in board and tally exclude the adult's response",
+      "members": {
+        "parent": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at) VALUES ('ne-storm', ?, ?, 1, ?, ?, '2026-08-01T09:00:00Z')",
+          "params": [
+            "Ice storm",
+            "Check in when you can.",
+            "{{parent}}",
+            "Parent Coordinator"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES ('ne-resp-parent', 'ne-storm', ?, ?, 'power', '2026-08-01T10:00:00Z')",
+          "params": [
+            "{{parent}}",
+            "Pat Parent"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES ('ne-resp-kid', 'ne-storm', ?, ?, 'ok', '2026-08-01T11:00:00Z')",
+          "params": [
+            "{{kid}}",
+            "Kim Kid"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "expectVisible",
+          "as": "kid",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"storm\"]"
+        },
+        {
+          "action": "click",
+          "as": "kid",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"storm\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "kid",
+          "selector": "[data-testid=\"checkin-board\"][data-event-id=\"ne-storm\"]"
+        },
+        {
+          "action": "expectNoText",
+          "as": "kid",
+          "text": "Pat Parent"
+        },
+        {
+          "action": "expectCount",
+          "as": "kid",
+          "selector": "[data-testid=\"checkin-row\"]",
+          "count": 1
+        },
+        {
+          "action": "expectText",
+          "as": "kid",
+          "text": "No power / water: 0",
+          "selector": "[data-testid=\"tally-pill\"][data-status=\"power\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "kid",
+          "text": "Kim Kid"
+        },
+        {
+          "action": "open",
+          "as": "parent"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"storm\"]"
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"storm\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"checkin-board\"][data-event-id=\"ne-storm\"]"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"checkin-row\"]",
+          "count": 2
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "text": "Pat Parent"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "text": "No power / water: 1",
+          "selector": "[data-testid=\"tally-pill\"][data-status=\"power\"]"
+        }
+      ]
+    }
+  ]
+}

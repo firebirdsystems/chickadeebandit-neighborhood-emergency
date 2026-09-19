@@ -12,8 +12,8 @@
       --text: var(--hub-text, #000000); --muted: var(--hub-text-muted, #6b7280);
       --accent: var(--hub-primary, #ea580c); --accent-hover: var(--hub-primary-hover, #c2410c);
       --accent-fg: var(--hub-primary-fg, #fff); --radius: var(--hub-radius, 8px);
-      --green: #047857; --green-soft: #d1fae5; --amber: #b45309; --amber-soft: #fef3c7;
-      --red: #b91c1c; --red-soft: #fee2e2; --blue: #1d4ed8; --blue-soft: #dbeafe;
+      --green: var(--hub-tint-success-fg, #047857); --green-soft: var(--hub-tint-success, #d1fae5); --amber: var(--hub-tint-warning-fg, #b45309); --amber-soft: var(--hub-tint-warning, #fef3c7);
+      --red: var(--hub-tint-danger-fg, #b91c1c); --red-soft: var(--hub-tint-danger, #fee2e2); --blue: var(--hub-tint-info-fg, #1d4ed8); --blue-soft: var(--hub-tint-info, #dbeafe);
       --shadow: 0 1px 3px rgba(15,23,42,.07);
     }
     body { min-height: 100vh; background: var(--bg); color: var(--text);
@@ -26,7 +26,7 @@
     .stack { display: grid; gap: 10px; }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
     .row-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .pill { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: var(--muted); font-size: .72rem; font-weight: 700; }
+    .pill { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); font-size: .72rem; font-weight: 700; }
     .pill.good { background: var(--green-soft); color: var(--green); }
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.bad { background: var(--red-soft); color: var(--red); }
@@ -48,7 +48,7 @@
     .who { display: inline-flex; align-items: center; gap: 7px; }
     .meta { color: var(--muted); font-size: .8rem; margin-top: 3px; }
     .banner { border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
-    .banner.alert { background: var(--red-soft); border: 1px solid #fecaca; }
+    .banner.alert { background: var(--red-soft); border: 1px solid var(--hub-tint-danger-border, #fecaca); }
     .banner.alert strong { color: var(--red); }
     .status-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
     .status-btn { border: 1.5px solid var(--border-mid); border-radius: 8px; padding: 10px; background: var(--surface); font: inherit; font-weight: 700; cursor: pointer; }

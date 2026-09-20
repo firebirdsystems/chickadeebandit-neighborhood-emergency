@@ -1,5 +1,7 @@
 # Neighborhood Ready
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/neighborhood-emergency) app.
+
 Community emergency preparedness for the HOA / neighborhood tier. When the storm hits, the
 neighborhood that already knows who has a generator and who's CPR-certified fares a lot better.
 

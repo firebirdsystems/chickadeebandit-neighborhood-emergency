@@ -64,6 +64,107 @@
           "expect": { "status": 200, "rowCount": 3 }
         }
       ]
+    },
+    {
+      "name": "in a shared space only the steward sees and corrects every member's check-in; a participant adult reaches only their own",
+      "context": "shared_space",
+      "members": { "a": "adult", "b": "adult", "steward": "admin" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES ('r-a', 'ev1', ?, 'A', 'ok', '', '2026-09-01T00:00:00Z'), ('r-b', 'ev1', ?, 'B', 'help', 'tree down', '2026-09-01T00:00:00Z')",
+          "params": ["{{a}}", "{{b}}"]
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "SELECT id FROM app_neighborhood_emergency__checkin_responses ORDER BY id",
+          "params": [],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "r-a" }] }
+        },
+        {
+          "action": "db",
+          "as": "a",
+          "sql": "UPDATE app_neighborhood_emergency__checkin_responses SET status = ? WHERE id = ?",
+          "params": ["ok", "r-b"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "steward",
+          "sql": "SELECT id, status FROM app_neighborhood_emergency__checkin_responses ORDER BY id",
+          "params": [],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [{ "id": "r-a", "status": "ok" }, { "id": "r-b", "status": "help" }]
+          }
+        },
+        {
+          "action": "db",
+          "as": "steward",
+          "sql": "UPDATE app_neighborhood_emergency__checkin_responses SET status = ? WHERE id = ?",
+          "params": ["power", "r-b"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "b",
+          "sql": "SELECT id, status FROM app_neighborhood_emergency__checkin_responses",
+          "params": [],
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "r-b", "status": "power" }] }
+        }
+      ]
+    },
+    {
+      "name": "a coordinator-group adult opens and closes a check-in event; a plain adult outside the group is refused both",
+      "members": { "coord": "adult", "member": "adult" },
+      "steps": [
+        { "action": "seedGroup", "group": "coords", "name": "Coordinators", "members": ["coord"] },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_neighborhood_emergency__settings (key, value) VALUES ('coordinator_group_id', ?)",
+          "params": ["{{group:coords}}"]
+        },
+        {
+          "action": "db",
+          "as": "coord",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at) VALUES ('ev1', 'Storm check-in', '', 1, ?, 'Coord', '2026-09-01T00:00:00Z')",
+          "params": ["{{coord}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "member",
+          "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at) VALUES ('ev2', 'Fake alarm', '', 1, ?, 'Member', '2026-09-01T00:00:00Z')",
+          "params": ["{{member}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "member",
+          "sql": "UPDATE app_neighborhood_emergency__checkin_events SET active = 0 WHERE id = 'ev1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "member",
+          "sql": "SELECT id, active FROM app_neighborhood_emergency__checkin_events",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ev1", "active": 1 }] }
+        },
+        {
+          "action": "db",
+          "as": "coord",
+          "sql": "UPDATE app_neighborhood_emergency__checkin_events SET active = 0, closed_at = '2026-09-02T00:00:00Z' WHERE id = 'ev1'",
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "member",
+          "sql": "SELECT id, active FROM app_neighborhood_emergency__checkin_events",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ev1", "active": 0 }] }
+        }
+      ]
     }
   ]
 }

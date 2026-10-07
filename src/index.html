@@ -82,7 +82,7 @@
 <div class="app"><div id="root" class="empty">Loading…</div></div>
 
 <script type="module">
-import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl, searchMatch } from "/hub-sdk.js";
+import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl, searchMatch, glyph } from "/hub-sdk.js";
 import {
   STATUSES, statusOf, isCoordinator as isCoordinatorOf,
   activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind, searchableFields,
@@ -347,7 +347,7 @@ function renderRegistry() {
               <div class="who">${avatar(r.member_id, r.member_name)}<strong>${esc(r.label)}</strong></div>
               <div class="meta">${esc(r.member_name)}${r.detail ? ` — ${esc(r.detail)}` : ""}</div>
             </div>
-            ${(r.member_id === me?.id) ? `<button class="btn-icon" title="Remove" data-del-res="${esc(r.id)}">🗑️</button>` : ""}
+            ${(r.member_id === me?.id) ? `<button class="btn-icon" title="Remove" data-del-res="${esc(r.id)}" aria-label="Remove">${glyph("trash")}</button>` : ""}
           </div>`).join("") : `<div class="card empty tiny">Nothing listed yet.</div>`}</div>`;
     }).join("")}`;
 }
@@ -362,10 +362,10 @@ function renderPhoneTree() {
         <div class="card row-card">
           <div>
             <strong>${esc(c.name)}</strong>${c.role ? ` <span class="pill info">${esc(c.role)}</span>` : ""}
-            <div class="meta">${c.phone ? `📞 <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : ""}${c.area ? ` · ${esc(c.area)}` : ""}</div>
+            <div class="meta">${c.phone ? `${glyph("phone")} <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : ""}${c.area ? ` · ${esc(c.area)}` : ""}</div>
             ${c.notes ? `<div class="meta">${esc(c.notes)}</div>` : ""}
           </div>
-          ${canManage() ? `<div style="display:flex;gap:2px"><button class="btn-icon" title="Edit" data-edit-con="${esc(c.id)}">✏️</button><button class="btn-icon" title="Remove" data-del-con="${esc(c.id)}">🗑️</button></div>` : ""}
+          ${canManage() ? `<div style="display:flex;gap:2px"><button class="btn-icon" title="Edit" data-edit-con="${esc(c.id)}" aria-label="Edit">${glyph("pencil")}</button><button class="btn-icon" title="Remove" data-del-con="${esc(c.id)}" aria-label="Remove">${glyph("trash")}</button></div>` : ""}
         </div>`).join("") : `<div class="card empty">${searchQ ? `No contacts match "${esc(searchQ)}".` : "No contacts yet."}</div>`}
     </div>`;
 }
@@ -373,7 +373,7 @@ function renderPhoneTree() {
 function renderStorm() {
   const active = activeEvent();
   let html = `<div class="section-head"><h2>Storm mode</h2><div style="display:flex;gap:6px">
-    ${IS_ADMIN ? `<button class="btn btn-ghost btn-sm" data-settings>⚙️ Coordinators</button>` : ""}
+    ${IS_ADMIN ? `<button class="btn btn-ghost btn-sm" data-settings>${glyph("gear")} Coordinators</button>` : ""}
     ${isCoordinator() && !active ? `<button class="btn btn-danger btn-sm" data-add="storm">Start check-in</button>` : ""}
   </div></div>`;
   if (active) {
@@ -382,7 +382,7 @@ function renderStorm() {
     const counts = countStatuses(responses, active.id);
     html += `
       <div class="banner alert">
-        <strong>🚨 ${esc(active.title)}</strong>
+        <strong>${glyph("siren")} ${esc(active.title)}</strong>
         ${active.message ? `<div class="meta" style="color:inherit">${esc(active.message)}</div>` : ""}
         <div style="margin:12px 0 6px" class="tiny muted">How are you doing?</div>
         <div class="status-grid">
@@ -428,7 +428,7 @@ function render() {
   root.className = "";
   const body = tab === "registry" ? renderRegistry() : tab === "phone" ? renderPhoneTree() : renderStorm();
   root.innerHTML = `
-    <div class="topbar"><div><h1>🚨 Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
+    <div class="topbar"><div><h1>${glyph("siren")} Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
     ${error ? `<div class="error">${esc(error)}</div>` : ""}
     <div class="tabs">${TABS.map(t => `<button class="tab ${tab === t.id ? "active" : ""}" data-testid="app-tab" data-tab="${t.id}">${t.label}</button>`).join("")}</div>
     ${body}`;

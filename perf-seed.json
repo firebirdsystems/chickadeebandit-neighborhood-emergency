@@ -1,0 +1,1343 @@
+{
+  "groups": [
+    {
+      "key": "coords",
+      "name": "Coordinators",
+      "members": [
+        "{{me}}",
+        "{{adult2}}"
+      ]
+    }
+  ],
+  "seed": [
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__settings (key, value) VALUES (?, ?)",
+      "params": [
+        "coordinator_group_id",
+        "{{group:coords}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-168 days','-9 minutes'))",
+      "params": [
+        "perf-res-01",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Portable generator",
+        "5000W, plus extra fuel",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-166 days','-18 minutes'))",
+      "params": [
+        "perf-res-02",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Chainsaw",
+        "Can help clear downed trees",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-164 days','-27 minutes'))",
+      "params": [
+        "perf-res-03",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Pickup truck",
+        "Half-ton, tow hitch",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-162 days','-36 minutes'))",
+      "params": [
+        "perf-res-04",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Camp stove",
+        "Two burners, four fuel canisters",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-160 days','-45 minutes'))",
+      "params": [
+        "perf-res-05",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Extension ladder",
+        "24 foot",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-158 days','-54 minutes'))",
+      "params": [
+        "perf-res-06",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Sump pump",
+        "Spare, with 50 ft of hose",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-156 days','-63 minutes'))",
+      "params": [
+        "perf-res-07",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Two-way radios",
+        "Set of six, charged monthly",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-154 days','-72 minutes'))",
+      "params": [
+        "perf-res-08",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "First aid kit",
+        "Large, restocked in spring",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-152 days','-81 minutes'))",
+      "params": [
+        "perf-res-09",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Snow blower",
+        "Happy to do neighbors' drives",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-150 days','-90 minutes'))",
+      "params": [
+        "perf-res-10",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Water storage",
+        "Four 7-gallon jugs",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-148 days','-99 minutes'))",
+      "params": [
+        "perf-res-11",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Wheelbarrow and shovels",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-146 days','-108 minutes'))",
+      "params": [
+        "perf-res-12",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Tarps and rope",
+        "Several large tarps",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-144 days','-117 minutes'))",
+      "params": [
+        "perf-res-13",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Propane heater",
+        "Indoor-safe, two tanks",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-142 days','-126 minutes'))",
+      "params": [
+        "perf-res-14",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Battery bank",
+        "Charges phones for days",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-140 days','-135 minutes'))",
+      "params": [
+        "perf-res-15",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Wet/dry vacuum",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-138 days','-144 minutes'))",
+      "params": [
+        "perf-res-16",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Fire extinguishers",
+        "Three, inspected this year",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-136 days','-153 minutes'))",
+      "params": [
+        "perf-res-17",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Cooler chest",
+        "Large, holds ice for five days",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-134 days','-162 minutes'))",
+      "params": [
+        "perf-res-18",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Tool chest",
+        "Full socket and wrench set",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-132 days','-171 minutes'))",
+      "params": [
+        "perf-res-19",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Flashlights and lanterns",
+        "A dozen, with spare batteries",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','-180 minutes'))",
+      "params": [
+        "perf-res-20",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Spare bedding",
+        "Six blankets, four sleeping bags",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-128 days','-189 minutes'))",
+      "params": [
+        "perf-res-21",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Hand-crank radio",
+        "Weather band",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-126 days','-198 minutes'))",
+      "params": [
+        "perf-res-22",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Bicycle trailer",
+        "For hauling supplies",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-124 days','-207 minutes'))",
+      "params": [
+        "perf-res-23",
+        "{{partner}}",
+        "Jordan",
+        "equipment",
+        "Canoe",
+        "If the creek floods",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-122 days','-216 minutes'))",
+      "params": [
+        "perf-res-24",
+        "{{adult2}}",
+        "Sam",
+        "equipment",
+        "Pet carriers",
+        "Two large, one small",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-120 days','-225 minutes'))",
+      "params": [
+        "perf-res-25",
+        "{{me}}",
+        "Alex",
+        "equipment",
+        "Folding cots",
+        "Three",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-118 days','-234 minutes'))",
+      "params": [
+        "perf-res-26",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "EMT / first aid",
+        "Certified, has a full trauma kit",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-116 days','-243 minutes'))",
+      "params": [
+        "perf-res-27",
+        "{{adult2}}",
+        "Sam",
+        "skill",
+        "CPR certified",
+        "Renewed this year",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-114 days','-252 minutes'))",
+      "params": [
+        "perf-res-28",
+        "{{me}}",
+        "Alex",
+        "skill",
+        "Electrician",
+        "Can check a panel safely",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-112 days','-261 minutes'))",
+      "params": [
+        "perf-res-29",
+        "{{child}}",
+        "Rowan",
+        "skill",
+        "Plumbing",
+        "Can shut off and patch a burst pipe",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-110 days','-270 minutes'))",
+      "params": [
+        "perf-res-30",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "Ham radio operator",
+        "Licensed, home station",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','-279 minutes'))",
+      "params": [
+        "perf-res-31",
+        "{{adult2}}",
+        "Sam",
+        "skill",
+        "Nurse",
+        "Pediatric, twelve years",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-106 days','-288 minutes'))",
+      "params": [
+        "perf-res-32",
+        "{{child2}}",
+        "Juniper",
+        "skill",
+        "Speaks Spanish",
+        "Can translate",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-104 days','-297 minutes'))",
+      "params": [
+        "perf-res-33",
+        "{{me}}",
+        "Alex",
+        "skill",
+        "Childcare",
+        "Can watch kids during a response",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','-306 minutes'))",
+      "params": [
+        "perf-res-34",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "Carpentry",
+        "Can board up windows",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-100 days','-315 minutes'))",
+      "params": [
+        "perf-res-35",
+        "{{adult2}}",
+        "Sam",
+        "skill",
+        "Chainsaw certified",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-98 days','-324 minutes'))",
+      "params": [
+        "perf-res-36",
+        "{{me}}",
+        "Alex",
+        "skill",
+        "Speaks Mandarin",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','-333 minutes'))",
+      "params": [
+        "perf-res-37",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "Cooking for a crowd",
+        "Has fed fifty from a camp kitchen",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','-342 minutes'))",
+      "params": [
+        "perf-res-38",
+        "{{adult2}}",
+        "Sam",
+        "skill",
+        "Tree climbing and rigging",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','-351 minutes'))",
+      "params": [
+        "perf-res-39",
+        "{{me}}",
+        "Alex",
+        "skill",
+        "Sign language",
+        "Conversational ASL",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','-360 minutes'))",
+      "params": [
+        "perf-res-40",
+        "{{child}}",
+        "Rowan",
+        "skill",
+        "Pet first aid",
+        "Vet tech",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-88 days','-369 minutes'))",
+      "params": [
+        "perf-res-41",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "Babysitting course",
+        "Red Cross certified",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-86 days','-378 minutes'))",
+      "params": [
+        "perf-res-42",
+        "{{adult2}}",
+        "Sam",
+        "skill",
+        "Counseling",
+        "Licensed, crisis trained",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-387 minutes'))",
+      "params": [
+        "perf-res-43",
+        "{{child2}}",
+        "Juniper",
+        "skill",
+        "Snow shoveling",
+        "Will dig out neighbors",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','-396 minutes'))",
+      "params": [
+        "perf-res-44",
+        "{{me}}",
+        "Alex",
+        "skill",
+        "Small engine repair",
+        "Generators and mowers",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-80 days','-405 minutes'))",
+      "params": [
+        "perf-res-45",
+        "{{partner}}",
+        "Jordan",
+        "skill",
+        "Search and rescue volunteer",
+        "County team",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+0 minutes'))",
+      "params": [
+        "perf-contact-01",
+        "Maria Alvarez",
+        "Block captain",
+        "555-0300",
+        "Houses 1-20",
+        "Call first, text second.",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+1 minutes'))",
+      "params": [
+        "perf-contact-02",
+        "Devon Brooks",
+        "Deputy captain",
+        "555-0301",
+        "Houses 21-40",
+        "Has a key to the community hall.",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+2 minutes'))",
+      "params": [
+        "perf-contact-03",
+        "Priya Rahman",
+        "Coordinator",
+        "555-0302",
+        "Whole neighborhood",
+        "Home most weekdays.",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+3 minutes'))",
+      "params": [
+        "perf-contact-04",
+        "City Gas Emergency Line",
+        "Gas utility",
+        "555-0303",
+        "Prefers text.",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, sort_order, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+4 minutes'))",
+      "params": [
+        "perf-contact-05",
+        "Valley Electric Outage Line",
+        "Power utility",
+        "555-0304",
+        4
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, sort_order, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+5 minutes'))",
+      "params": [
+        "perf-contact-06",
+        "Water Department After Hours",
+        "Water utility",
+        "555-0305",
+        5
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+6 minutes'))",
+      "params": [
+        "perf-contact-07",
+        "Non-emergency Police",
+        "Police",
+        "555-0306",
+        "Call first, text second.",
+        6
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+7 minutes'))",
+      "params": [
+        "perf-contact-08",
+        "Fire Station 12",
+        "Fire",
+        "555-0307",
+        "Has a key to the community hall.",
+        7
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+8 minutes'))",
+      "params": [
+        "perf-contact-09",
+        "Dr. Okafor",
+        "Physician on the block",
+        "555-0308",
+        "Elm Court",
+        "Home most weekdays.",
+        8
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+9 minutes'))",
+      "params": [
+        "perf-contact-10",
+        "Tomas Lindqvist",
+        "Block captain",
+        "555-0309",
+        "North block",
+        "Prefers text.",
+        9
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+10 minutes'))",
+      "params": [
+        "perf-contact-11",
+        "Grace Chen",
+        "Block captain",
+        "555-0310",
+        "South block",
+        10
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+11 minutes'))",
+      "params": [
+        "perf-contact-12",
+        "Kenji Tanaka",
+        "Radio operator",
+        "555-0311",
+        "Whole neighborhood",
+        11
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+12 minutes'))",
+      "params": [
+        "perf-contact-13",
+        "Lucia Moreau",
+        "Senior check-ins",
+        "555-0312",
+        "Maple Row",
+        "Call first, text second.",
+        12
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+13 minutes'))",
+      "params": [
+        "perf-contact-14",
+        "Owen Fischer",
+        "Tool library",
+        "555-0313",
+        "Garage at number 14",
+        "Has a key to the community hall.",
+        13
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+14 minutes'))",
+      "params": [
+        "perf-contact-15",
+        "Fatima Haddad",
+        "Translator",
+        "555-0314",
+        "Whole neighborhood",
+        "Home most weekdays.",
+        14
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+15 minutes'))",
+      "params": [
+        "perf-contact-16",
+        "Noah Whitaker",
+        "Shelter host",
+        "555-0315",
+        "Community hall",
+        "Prefers text.",
+        15
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+16 minutes'))",
+      "params": [
+        "perf-contact-17",
+        "Ingrid Soto",
+        "Pet coordinator",
+        "555-0316",
+        "Whole neighborhood",
+        16
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+17 minutes'))",
+      "params": [
+        "perf-contact-18",
+        "Rafael Castillo",
+        "Road clearing",
+        "555-0317",
+        "Cedar Lane",
+        17
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+18 minutes'))",
+      "params": [
+        "perf-contact-19",
+        "Mei Kowalski",
+        "Childcare lead",
+        "555-0318",
+        "Community hall",
+        "Call first, text second.",
+        18
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+19 minutes'))",
+      "params": [
+        "perf-contact-20",
+        "Calvin Dubois",
+        "Block captain",
+        "555-0319",
+        "East block",
+        "Has a key to the community hall.",
+        19
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+20 minutes'))",
+      "params": [
+        "perf-contact-21",
+        "Zara Achebe",
+        "Block captain",
+        "555-0320",
+        "West block",
+        "Home most weekdays.",
+        20
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+21 minutes'))",
+      "params": [
+        "perf-contact-22",
+        "Hugo Petrov",
+        "Generator sharing",
+        "555-0321",
+        "Houses 41-60",
+        "Prefers text.",
+        21
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+22 minutes'))",
+      "params": [
+        "perf-contact-23",
+        "Nadia Greene",
+        "Food and water",
+        "555-0322",
+        "Community hall",
+        22
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, sort_order, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+23 minutes'))",
+      "params": [
+        "perf-contact-24",
+        "Red Cross Local Chapter",
+        "Relief",
+        "555-0323",
+        23
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+24 minutes'))",
+      "params": [
+        "perf-contact-25",
+        "Poison Control",
+        "Hotline",
+        "555-0324",
+        "Call first, text second.",
+        24
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+25 minutes'))",
+      "params": [
+        "perf-contact-26",
+        "County Emergency Management",
+        "County",
+        "555-0325",
+        "Has a key to the community hall.",
+        25
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+26 minutes'))",
+      "params": [
+        "perf-contact-27",
+        "Felix Bennett",
+        "Building manager",
+        "555-0326",
+        "Oak Apartments",
+        "Home most weekdays.",
+        26
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+27 minutes'))",
+      "params": [
+        "perf-contact-28",
+        "Tessa Nakamura",
+        "School liaison",
+        "555-0327",
+        "Elementary school",
+        "Prefers text.",
+        27
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+28 minutes'))",
+      "params": [
+        "perf-contact-29",
+        "Andre Okafor",
+        "Snow crew",
+        "555-0328",
+        "North block",
+        28
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-175 days','+29 minutes'))",
+      "params": [
+        "perf-contact-30",
+        "Chloe Alvarez",
+        "Youth volunteers",
+        "555-0329",
+        "Whole neighborhood",
+        29
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-5 hours'))",
+      "params": [
+        "perf-event-01",
+        "Wind storm tonight",
+        "Gusts to 60 mph expected after 8pm. Check in once it passes.",
+        1,
+        "{{me}}",
+        "Alex",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-200 minutes'))",
+      "params": [
+        "perf-resp-01",
+        "perf-event-01",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-160 minutes'))",
+      "params": [
+        "perf-resp-02",
+        "perf-event-01",
+        "{{adult2}}",
+        "Sam",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-120 minutes'))",
+      "params": [
+        "perf-resp-03",
+        "perf-event-01",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-80 minutes'))",
+      "params": [
+        "perf-resp-04",
+        "perf-event-01",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days'))",
+      "params": [
+        "perf-event-02",
+        "Boil-water notice",
+        "Water main break on Cedar Lane. Let us know if you need bottled water.",
+        0,
+        "{{adult2}}",
+        "Sam",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+20 minutes'))",
+      "params": [
+        "perf-resp-05",
+        "perf-event-02",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+55 minutes'))",
+      "params": [
+        "perf-resp-06",
+        "perf-event-02",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+90 minutes'))",
+      "params": [
+        "perf-resp-07",
+        "perf-event-02",
+        "{{adult2}}",
+        "Sam",
+        "power",
+        "Out since about nine."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+125 minutes'))",
+      "params": [
+        "perf-resp-08",
+        "perf-event-02",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+160 minutes'))",
+      "params": [
+        "perf-resp-09",
+        "perf-event-02",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days'))",
+      "params": [
+        "perf-event-03",
+        "Power outage, north block",
+        "Outage reported at 6am. Who is affected?",
+        0,
+        "{{me}}",
+        "Alex",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+20 minutes'))",
+      "params": [
+        "perf-resp-10",
+        "perf-event-03",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+55 minutes'))",
+      "params": [
+        "perf-resp-11",
+        "perf-event-03",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+90 minutes'))",
+      "params": [
+        "perf-resp-12",
+        "perf-event-03",
+        "{{adult2}}",
+        "Sam",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+125 minutes'))",
+      "params": [
+        "perf-resp-13",
+        "perf-event-03",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-33 days'))",
+      "params": [
+        "perf-event-04",
+        "Heat advisory",
+        "Three days over 100. Check on your neighbors.",
+        0,
+        "{{adult2}}",
+        "Sam",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+20 minutes'))",
+      "params": [
+        "perf-resp-14",
+        "perf-event-04",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+55 minutes'))",
+      "params": [
+        "perf-resp-15",
+        "perf-event-04",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+90 minutes'))",
+      "params": [
+        "perf-resp-16",
+        "perf-event-04",
+        "{{adult2}}",
+        "Sam",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+160 minutes'))",
+      "params": [
+        "perf-resp-17",
+        "perf-event-04",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days'))",
+      "params": [
+        "perf-event-05",
+        "Smoke from the ridge fire",
+        "Air quality is poor. Anyone need filters or a place to go?",
+        0,
+        "{{me}}",
+        "Alex",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+20 minutes'))",
+      "params": [
+        "perf-resp-18",
+        "perf-event-05",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+55 minutes'))",
+      "params": [
+        "perf-resp-19",
+        "perf-event-05",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+125 minutes'))",
+      "params": [
+        "perf-resp-20",
+        "perf-event-05",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+160 minutes'))",
+      "params": [
+        "perf-resp-21",
+        "perf-event-05",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days'))",
+      "params": [
+        "perf-event-06",
+        "Flash flood watch",
+        "Creek is rising. Report any water in basements.",
+        0,
+        "{{me}}",
+        "Alex",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+20 minutes'))",
+      "params": [
+        "perf-resp-22",
+        "perf-event-06",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+90 minutes'))",
+      "params": [
+        "perf-resp-23",
+        "perf-event-06",
+        "{{adult2}}",
+        "Sam",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+125 minutes'))",
+      "params": [
+        "perf-resp-24",
+        "perf-event-06",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+160 minutes'))",
+      "params": [
+        "perf-resp-25",
+        "perf-event-06",
+        "{{child2}}",
+        "Juniper",
+        "help",
+        "Tree down across the drive."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-71 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days'))",
+      "params": [
+        "perf-event-07",
+        "Gas smell on Maple Row",
+        "Utility is on site. Everyone accounted for?",
+        0,
+        "{{adult2}}",
+        "Sam",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-71 days','+55 minutes'))",
+      "params": [
+        "perf-resp-26",
+        "perf-event-07",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-71 days','+90 minutes'))",
+      "params": [
+        "perf-resp-27",
+        "perf-event-07",
+        "{{adult2}}",
+        "Sam",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-71 days','+125 minutes'))",
+      "params": [
+        "perf-resp-28",
+        "perf-event-07",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-71 days','+160 minutes'))",
+      "params": [
+        "perf-resp-29",
+        "perf-event-07",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, visibility, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','-0 hours'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days'))",
+      "params": [
+        "perf-event-08",
+        "Quarterly drill",
+        "This is a drill. Please check in as if it were real.",
+        0,
+        "{{me}}",
+        "Alex",
+        "everyone"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+20 minutes'))",
+      "params": [
+        "perf-resp-30",
+        "perf-event-08",
+        "{{me}}",
+        "Alex",
+        "ok",
+        "All fine here."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+55 minutes'))",
+      "params": [
+        "perf-resp-31",
+        "perf-event-08",
+        "{{partner}}",
+        "Jordan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+90 minutes'))",
+      "params": [
+        "perf-resp-32",
+        "perf-event-08",
+        "{{adult2}}",
+        "Sam",
+        "power",
+        "Out since about nine."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+125 minutes'))",
+      "params": [
+        "perf-resp-33",
+        "perf-event-08",
+        "{{child}}",
+        "Rowan",
+        "ok"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, responded_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+160 minutes'))",
+      "params": [
+        "perf-resp-34",
+        "perf-event-08",
+        "{{child2}}",
+        "Juniper",
+        "ok"
+      ]
+    }
+  ]
+}

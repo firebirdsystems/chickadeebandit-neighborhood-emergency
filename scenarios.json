@@ -165,6 +165,22 @@
           "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ev1", "active": 0 }] }
         }
       ]
+    },
+    {
+      "name": "in a shared space a coordinator reads every check-in response but changes only their own; another participant reads only their own",
+      "context": "shared_space",
+      "members": {"coord": "adult", "a": "adult", "b": "adult", "steward": "admin"},
+      "steps": [
+        {"action": "seedGroup", "group": "coords", "name": "Coordinators", "members": ["coord"]},
+        {"action": "seedRaw", "sql": "INSERT INTO app_neighborhood_emergency__settings (key, value) VALUES ('coordinator_group_id', ?)", "params": ["{{group:coords}}"]},
+        {"action": "seedRaw", "sql": "INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at) VALUES ('ev1', 'Storm check-in', '', 1, ?, 'Coord', '2026-09-01T00:00:00Z')", "params": ["{{coord}}"]},
+        {"action": "seedRaw", "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, 'ev1', ?, ?, 'ok', '', '2026-09-01T01:00:00Z')", "params": ["rs-a", "{{a}}", "A"]},
+        {"action": "seedRaw", "sql": "INSERT INTO app_neighborhood_emergency__checkin_responses (id, event_id, member_id, member_name, status, note, responded_at) VALUES (?, 'ev1', ?, ?, 'ok', '', '2026-09-01T01:00:00Z')", "params": ["rs-b", "{{b}}", "B"]},
+        {"action": "db", "as": "coord", "sql": "SELECT id FROM app_neighborhood_emergency__checkin_responses ORDER BY id", "expect": {"status": 200, "rowCount": 2}},
+        {"action": "db", "as": "a", "sql": "SELECT id FROM app_neighborhood_emergency__checkin_responses ORDER BY id", "expect": {"status": 200, "rowCount": 1, "rowsContain": [{"id": "rs-a"}]}},
+        {"action": "db", "as": "coord", "sql": "UPDATE app_neighborhood_emergency__checkin_responses SET status = 'help' WHERE id = ? RETURNING id", "params": ["rs-a"], "expect": {"status": 200, "rowCount": 0}},
+        {"action": "db", "as": "steward", "sql": "SELECT id, status FROM app_neighborhood_emergency__checkin_responses ORDER BY id", "expect": {"status": 200, "rowCount": 2, "rowsContain": [{"id": "rs-a", "status": "ok"}]}}
+      ]
     }
   ]
 }

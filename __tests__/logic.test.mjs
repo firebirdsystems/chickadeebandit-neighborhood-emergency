@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  STATUSES, statusOf, isCoordinator, activeEvent, myResponse, resourcesByKind, countStatuses, searchableFields,
+  STATUSES, statusOf, isCoordinator, seesAllResponses, activeEvent, myResponse, resourcesByKind, countStatuses, searchableFields,
 } from "../src/logic.js";
 
 describe("statusOf", () => {
@@ -10,25 +10,41 @@ describe("statusOf", () => {
 
 describe("isCoordinator", () => {
   const groups = [{ id: "g-coord", memberIds: ["m-in"] }];
-  it("hub admins are always coordinators", () => {
-    expect(isCoordinator({ id: "x" }, true, "", [])).toBe(true);
-  });
   it("members of the configured group qualify", () => {
-    expect(isCoordinator({ id: "m-in" }, false, "g-coord", groups)).toBe(true);
+    expect(isCoordinator({ id: "m-in" }, "g-coord", groups)).toBe(true);
   });
   it("non-members do not qualify", () => {
-    expect(isCoordinator({ id: "m-out" }, false, "g-coord", groups)).toBe(false);
+    expect(isCoordinator({ id: "m-out" }, "g-coord", groups)).toBe(false);
   });
-  // Contract: no "all adults" fallback when the group is unset or dangling.
+  // Contract: no "all adults" or admin fallback when the group is unset or dangling.
   it("is false when the coordinator group is unconfigured", () => {
-    expect(isCoordinator({ id: "m-in" }, false, "", groups)).toBe(false);
+    expect(isCoordinator({ id: "m-in" }, "", groups)).toBe(false);
+    expect(isCoordinator({ id: "m-in", role: "admin" }, null, groups)).toBe(false);
   });
   it("is false when the configured group no longer exists", () => {
-    expect(isCoordinator({ id: "m-in" }, false, "g-gone", groups)).toBe(false);
+    expect(isCoordinator({ id: "m-in" }, "g-gone", groups)).toBe(false);
   });
   it("is false with no member", () => {
-    expect(isCoordinator(null, false, "g-coord", groups)).toBe(false);
+    expect(isCoordinator(null, "g-coord", groups)).toBe(false);
   });
+});
+
+describe("seesAllResponses", () => {
+  const adult = { id: "a1", role: "adult" };
+  it("every adult at home", () => expect(seesAllResponses(adult)).toBe(true));
+  it("not a child", () => expect(seesAllResponses({ id: "c1", role: "child" })).toBe(false));
+  it("not without a member", () => expect(seesAllResponses(null)).toBe(false));
+  it("not a space participant", () =>
+    expect(seesAllResponses(adult, { tenantKind: "shared_space", isAdmin: false })).toBe(false));
+  it("the space steward", () =>
+    expect(seesAllResponses(adult, { tenantKind: "shared_space", isAdmin: true })).toBe(true));
+  it("a coordinator, whatever their role or the space", () => {
+    expect(seesAllResponses({ id: "c1", role: "child" }, { coordinator: true })).toBe(true);
+    expect(seesAllResponses(adult, { tenantKind: "shared_space", isAdmin: false, coordinator: true })).toBe(true);
+    expect(seesAllResponses(null, { coordinator: true })).toBe(false);
+  });
+  it("a co-parenting steward", () =>
+    expect(seesAllResponses(adult, { tenantKind: "shared_space", spaceKind: "coparenting", isAdmin: true })).toBe(true));
 });
 
 describe("activeEvent", () => {

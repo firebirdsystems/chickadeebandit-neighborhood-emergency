@@ -62,6 +62,8 @@
     textarea { min-height: 66px; resize: vertical; }
     input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
     .empty { text-align: center; padding: 34px 16px; color: var(--muted); }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
     .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
     .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
     .modal { background: var(--surface); border-radius: 12px; padding: 20px; width: 100%; max-width: 440px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 50px rgba(15,23,42,.25); }
@@ -84,7 +86,7 @@
 <script type="module">
 import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sendHubNotification, hubAppUrl, searchMatch, glyph } from "/hub-sdk.js";
 import {
-  STATUSES, statusOf, isCoordinator as isCoordinatorOf,
+  STATUSES, statusOf, isCoordinator as isCoordinatorOf, seesAllResponses as seesAllResponsesOf,
   activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind, searchableFields,
 } from "./logic.js";
 
@@ -95,23 +97,32 @@ const APP_ID = window.__APP_ID ?? "neighborhood-emergency";
 const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
 const ADMIN_CONFIG_URL = window.__ADMIN_CONFIG_URL ?? "";
 const IS_ADMIN = window.__IS_ADMIN != null ? !!window.__IS_ADMIN : !CONTEXT;
+// Where the app is running: the hub lets every adult at home read everyone's
+// check-in responses, and only the steward in a shared space.
+const TENANT = { tenantKind: window.__TENANT_KIND ?? "household", spaceKind: window.__SPACE_KIND ?? null, isAdmin: window.__IS_ADMIN === true };
 
 let members = [], memberMap = new Map(), me = null, groups = [];
 let resources = [], contacts = [], events = [], responses = [];
 let coordinatorGroupId = null;
 let tab = "registry", error = "", modalEl = null;
+let loadFailed = false; // the first load failed: nothing is known, so nothing is shown as empty
 let searchQ = "";       // in-app search (see logic.js searchableFields)
 
 function nowIso() { return new Date().toISOString(); }
 function uid(p) { return `${p}-${crypto.randomUUID()}`; }
 function canManage() { return isAdult(me); }
-function isCoordinator() { return isCoordinatorOf(me, IS_ADMIN, coordinatorGroupId, groups); }
+function isCoordinator() { return isCoordinatorOf(me, coordinatorGroupId, groups); }
+function seesAllResponses() { return seesAllResponsesOf(me, { ...TENANT, coordinator: isCoordinator() }); }
+// Shown to anyone who reads only their own response, naming who reads them all.
+const OWN_STATUS_NOTE = TENANT.tenantKind === "household"
+  ? "Coordinators and adults see everyone's status; you see your own."
+  : "Coordinators and the steward see everyone's status; you see your own.";
 
 async function db(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "That could not be saved");
   return json;
 }
 
@@ -125,12 +136,15 @@ async function loadMembers() {
     ];
     groups = [{ id: "demo-coord", name: "Block Coordinators", memberIds: ["demo-1", "demo-2"] }];
   } else {
-    try {
-      const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
-      const data = await res.json();
-      members = data["family.members"] ?? [];
-      groups = data["family.groups"] ?? [];
-    } catch { members = []; groups = []; }
+    // A roster that could not be read is a failed load, not an empty household.
+    const res = await fetch(`${CONTEXT}?keys=family.members,family.groups`);
+    if (!res.ok) throw new Error(`context ${res.status}`);
+    const data = await res.json();
+    if (!data || typeof data !== "object") throw new Error("context: unexpected response");
+    // The hub answers 200 and names a key it could not resolve in `$errors`.
+    if (Array.isArray(data.$errors) && (data.$errors.includes("family.members") || data.$errors.includes("family.groups"))) throw new Error("context: a requested key did not resolve");
+    members = data["family.members"] ?? [];
+    groups = data["family.groups"] ?? [];
   }
   memberMap = new Map(members.map(m => [m.id, m]));
   me = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
@@ -174,10 +188,10 @@ function settingsModal() {
   const opts = groups.map(g => `<option value="${esc(g.id)}" ${coordinatorGroupId === g.id ? "selected" : ""}>${esc(g.name)}</option>`).join("");
   openModal(`
     <h3>Storm-mode coordinators</h3>
-    <p class="muted tiny" style="margin-bottom:12px">Choose the hub group whose members may broadcast "are you OK?" check-ins to the whole neighborhood. Until one is set, only a hub admin can broadcast.</p>
+    <p class="muted tiny" style="margin-bottom:12px">Choose the hub group whose members may broadcast "are you OK?" check-ins to the whole neighborhood. Until one is set, nobody can broadcast.</p>
     <form class="form" id="settings-form">
       <div class="field"><label for="set-group">Coordinator group</label>
-        <select id="set-group">${groups.length ? `<option value="">— None (admins only) —</option>${opts}` : `<option value="">No hub groups exist yet</option>`}</select></div>
+        <select id="set-group">${groups.length ? `<option value="">— None —</option>${opts}` : `<option value="">No hub groups exist yet</option>`}</select></div>
       ${groups.length ? "" : `<p class="tiny" style="color:var(--amber)">Create a group in the hub's family/group settings first, then return here.</p>`}
       <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">Save</button></div>
     </form>`);
@@ -190,8 +204,8 @@ async function submitSettings(form) {
 }
 
 async function init() {
-  try { await Promise.all([loadMembers(), loadData()]); render(); }
-  catch (e) { error = e.message; render(); }
+  try { await Promise.all([loadMembers(), loadData()]); loadFailed = false; render(); }
+  catch { loadFailed = true; render(); }
 }
 
 function publish(type, payload) {
@@ -307,7 +321,11 @@ async function submitStorm(form) {
 async function closeStorm(id) {
   if (!(await hubConfirm({ message: "Close this check-in?", description: "Responses are kept for the record.", confirmLabel: "Close" }))) return;
   try {
-    if (DB) await db("UPDATE app_neighborhood_emergency__checkin_events SET active=0, closed_at=? WHERE id=?", [nowIso(), id]);
+    if (DB) {
+      // Only a coordinator's write reaches the row; anyone else's changes nothing.
+      const { changed } = await db("UPDATE app_neighborhood_emergency__checkin_events SET active=0, closed_at=? WHERE id=?", [nowIso(), id]);
+      if (changed === 0) { await loadData(); return showError("This check-in could not be closed."); }
+    }
     const e = events.find(x => x.id === id); if (e) { e.active = 0; e.closed_at = nowIso(); } render();
   } catch (e) { showError(e.message); }
 }
@@ -372,13 +390,16 @@ function renderPhoneTree() {
 
 function renderStorm() {
   const active = activeEvent();
+  const seesAll = seesAllResponses();
   let html = `<div class="section-head"><h2>Storm mode</h2><div style="display:flex;gap:6px">
     ${IS_ADMIN ? `<button class="btn btn-ghost btn-sm" data-settings>${glyph("gear")} Coordinators</button>` : ""}
     ${isCoordinator() && !active ? `<button class="btn btn-danger btn-sm" data-add="storm">Start check-in</button>` : ""}
   </div></div>`;
   if (active) {
-    const rs = responses.filter(r => r.event_id === active.id);
     const mine = myResponse(active.id);
+    // Someone who does not read everyone's responses has only their own, so the
+    // board shows that one status and no tally.
+    const rs = seesAll ? responses.filter(r => r.event_id === active.id) : (mine ? [mine] : []);
     const counts = countStatuses(responses, active.id);
     html += `
       <div class="banner alert">
@@ -392,17 +413,18 @@ function renderStorm() {
       </div>
       <div class="card stack" data-testid="checkin-board" data-event-id="${esc(active.id)}">
         <div class="who" style="justify-content:space-between">
-          <strong>Check-in board</strong>
-          ${isCoordinator() ? `<button class="btn btn-ghost btn-sm" data-close-storm="${esc(active.id)}">Close check-in</button>` : ""}
+          <strong>${seesAll ? "Check-in board" : "Your check-in"}</strong>
+          ${isCoordinator() ? `<button class="btn btn-ghost btn-sm" data-testid="close-checkin" data-close-storm="${esc(active.id)}">Close check-in</button>` : ""}
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" data-testid="status-tally">${counts.map(c => `<span class="pill ${c.s.pill}" data-testid="tally-pill" data-status="${esc(c.s.id)}">${esc(c.s.label.replace(/[^\w\s'/]/g, "").trim())}: ${c.n}</span>`).join("")}</div>
-        ${rs.length ? rs.map(r => `<div class="row-card" data-testid="checkin-row" data-response-id="${esc(r.id)}"><div class="who">${avatar(r.member_id, r.member_name)}<span>${esc(r.member_name)}</span></div><span class="pill ${statusOf(r.status).pill}">${esc(statusOf(r.status).label.replace(/[^\w\s'/]/g, "").trim())}</span></div>`).join("") : `<div class="tiny muted">No responses yet.</div>`}
-        ${!canManage() ? `<div class="tiny muted">Coordinators and adults see everyone's status; you see your own.</div>` : ""}
+        ${seesAll ? `<div style="display:flex;gap:8px;flex-wrap:wrap" data-testid="status-tally">${counts.map(c => `<span class="pill ${c.s.pill}" data-testid="tally-pill" data-status="${esc(c.s.id)}">${esc(c.s.label.replace(/[^\w\s'/]/g, "").trim())}: ${c.n}</span>`).join("")}</div>` : ""}
+        ${rs.length ? rs.map(r => `<div class="row-card" data-testid="checkin-row" data-response-id="${esc(r.id)}"><div class="who">${avatar(r.member_id, r.member_name)}<span>${esc(r.member_name)}</span></div><span class="pill ${statusOf(r.status).pill}">${esc(statusOf(r.status).label.replace(/[^\w\s'/]/g, "").trim())}</span></div>`).join("") : `<div class="tiny muted">${seesAll ? "No responses yet." : "You have not checked in yet."}</div>`}
+        ${seesAll ? "" : `<div class="tiny muted" data-testid="own-status-note">${OWN_STATUS_NOTE}</div>`}
+        ${IS_ADMIN && !isCoordinator() ? `<div class="tiny muted" data-testid="close-note">Only members of the coordinator group can close this check-in. Use Coordinators to change the group.</div>` : ""}
       </div>`;
   } else {
     const past = events.filter(e => !e.active);
-    html += `<div class="card empty">No active check-in. ${isCoordinator() ? "Start one when severe weather hits." : "You'll get a notification if a coordinator starts one."}</div>`;
-    if (past.length) html += `<h2 class="muted tiny" style="margin:14px 2px 8px">Past check-ins</h2><div class="stack">${past.map(e => `<div class="card row-card"><div><strong>${esc(e.title)}</strong><div class="meta">${esc(formatRelativeDate(e.created_at))} · ${responses.filter(r => r.event_id === e.id).length} responses</div></div></div>`).join("")}</div>`;
+    html += `<div class="card empty">No active check-in. ${isCoordinator() ? "Start one when severe weather hits." : IS_ADMIN ? (coordinatorGroupId ? "Only members of the coordinator group can start one. Use Coordinators to change the group." : "Use Coordinators to choose who can start one.") : "You'll get a notification if a coordinator starts one."}</div>`;
+    if (past.length) html += `<h2 class="muted tiny" style="margin:14px 2px 8px">Past check-ins</h2><div class="stack">${past.map(e => `<div class="card row-card"><div><strong>${esc(e.title)}</strong><div class="meta">${esc(formatRelativeDate(e.created_at))}${seesAll ? ` · ${responses.filter(r => r.event_id === e.id).length} responses` : (myResponse(e.id) ? " · You checked in" : "")}</div></div></div>`).join("")}</div>`;
   }
   return html;
 }
@@ -426,6 +448,12 @@ document.addEventListener("input", (e) => {
 function render() {
   const root = document.getElementById("root");
   root.className = "";
+  if (loadFailed) {
+    root.innerHTML = `
+      <div class="topbar"><div><h1>${glyph("siren")} Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
+      <div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the neighborhood plan.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`;
+    return;
+  }
   const body = tab === "registry" ? renderRegistry() : tab === "phone" ? renderPhoneTree() : renderStorm();
   root.innerHTML = `
     <div class="topbar"><div><h1>${glyph("siren")} Neighborhood Ready</h1><p class="muted tiny">Prepared together, before the storm.</p></div></div>
@@ -437,6 +465,7 @@ function render() {
 document.addEventListener("click", e => {
   const t = e.target.closest("button, [data-tab], a");
   if (!t) return;
+  if (t.dataset.testid === "load-retry") { firstLoad(); return; }
   if (t.dataset.tab) { tab = t.dataset.tab; error = ""; render(); return; }
   if (t.dataset.close !== undefined) { closeModal(); return; }
   const add = t.dataset.add;
@@ -465,7 +494,8 @@ function handleDeepLink() {
   if (eventId && events.some(e => e.id === eventId)) tab = "storm";
 }
 
-(async () => { await init(); handleDeepLink(); render(); })();
+async function firstLoad() { await init(); handleDeepLink(); render(); }
+firstLoad();
 </script>
 </body>
 </html>

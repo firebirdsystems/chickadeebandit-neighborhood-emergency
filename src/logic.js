@@ -11,14 +11,32 @@ export function statusOf(id) {
   return STATUSES.find(s => s.id === id) ?? STATUSES[0];
 }
 
-// Mirrors the hub's require_group_setting for notifications: a member may broadcast
-// a storm check-in iff they are a hub admin, or the coordinator group is configured
-// AND they belong to it. No "all adults" fallback — matches server enforcement.
-export function isCoordinator(me, isAdmin, coordinatorGroupId, groups) {
-  if (isAdmin) return true;
+// Whether a member may start or close a storm check-in. Mirrors the hub's rule
+// for the checkin_events table (write_privileged_only): the coordinator group
+// must be configured AND the member must belong to it. Being a hub admin or a
+// space's steward grants nothing here, and there is no "all adults" fallback.
+export function isCoordinator(me, coordinatorGroupId, groups) {
   if (!coordinatorGroupId || !me) return false;
   const g = groups.find(x => x.id === coordinatorGroupId);
   return !!g && (g.memberIds ?? []).includes(me.id);
+}
+
+// The hub's own test for an adult member (hub-sdk `isAdult`), repeated here so
+// the role rule below can be unit-tested without the browser-only SDK.
+function isAdultMember(member) {
+  return !!member && (member.role === "adult" || member.role === "admin");
+}
+
+/**
+ * Whether a member reads everyone's check-in responses. Mirrors the hub's rule
+ * for the checkin_responses table (owner_only, readable by the coordinator
+ * group): any adult in a household, the steward in a shared space, and the
+ * coordinators anywhere, since whoever runs a check-in has to see who answered.
+ * Everyone else reads their own response alone.
+ */
+export function seesAllResponses(member, { tenantKind = "household", isAdmin = false, coordinator = false } = {}) {
+  if (!member) return false;
+  return coordinator === true || (tenantKind === "household" ? isAdultMember(member) : isAdmin === true);
 }
 
 export function activeEvent(events) {

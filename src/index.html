@@ -200,7 +200,7 @@ async function submitSettings(form) {
   const groupId = form["set-group"].value;
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
   try { await saveSetting("coordinator_group_id", groupId); coordinatorGroupId = groupId || null; closeModal(); render(); }
-  catch (e) { btn.disabled = false; btn.textContent = "Save"; showError(e.message); }
+  catch (e) { btn.disabled = false; btn.textContent = "Save"; console.error(e); showError("Couldn’t save the coordinator group — try again."); }
 }
 
 async function init() {
@@ -245,12 +245,12 @@ async function submitResource(form) {
     if (DB) await db("INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?,?,?,?,?,?,?,?)",
       [row.id, row.member_id, row.member_name, row.kind, row.label, row.detail, row.visibility, row.created_at]);
     resources = [...resources, row]; closeModal(); render();
-  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; showError(e.message); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; console.error(e); showError("Couldn’t add that to the registry — try again."); }
 }
 async function deleteResource(id) {
   if (!(await hubConfirm({ message: "Remove this from the registry?", destructive: true, confirmLabel: "Remove" }))) return;
   try { if (DB) await db("DELETE FROM app_neighborhood_emergency__resources WHERE id=?", [id]); resources = resources.filter(x => x.id !== id); render(); }
-  catch (e) { showError(e.message); }
+  catch (e) { console.error(e); showError("Couldn’t remove that from the registry — try again."); }
 }
 
 /* ── contacts (phone tree) ── */
@@ -286,12 +286,12 @@ async function submitContact(form) {
       contacts = [...contacts, row];
     }
     closeModal(); render();
-  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; showError(e.message); }
+  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; console.error(e); showError("Couldn’t save the contact — try again."); }
 }
 async function deleteContact(id) {
   if (!(await hubConfirm({ message: "Remove this contact?", destructive: true, confirmLabel: "Remove" }))) return;
   try { if (DB) await db("DELETE FROM app_neighborhood_emergency__contacts WHERE id=?", [id]); contacts = contacts.filter(x => x.id !== id); render(); }
-  catch (e) { showError(e.message); }
+  catch (e) { console.error(e); showError("Couldn’t remove the contact — try again."); }
 }
 
 /* ── storm mode ── */
@@ -316,7 +316,7 @@ async function submitStorm(form) {
     events = [row, ...events]; closeModal(); render();
     publish("emergency.storm_activated", { event_id: row.id, title: row.title });
     sendHubNotification({ title: `🚨 ${row.title}`, body: row.message || "Tap to check in — are you OK?", url: hubAppUrl(APP_ID, { eventId: row.id }) }).catch(() => {});
-  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; showError(e.message); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; console.error(e); showError("Couldn’t start the check-in — try again."); }
 }
 async function closeStorm(id) {
   if (!(await hubConfirm({ message: "Close this check-in?", description: "Responses are kept for the record.", confirmLabel: "Close" }))) return;
@@ -327,7 +327,7 @@ async function closeStorm(id) {
       if (changed === 0) { await loadData(); return showError("This check-in could not be closed."); }
     }
     const e = events.find(x => x.id === id); if (e) { e.active = 0; e.closed_at = nowIso(); } render();
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t close the check-in — try again."); }
 }
 function myResponse(eventId) { return myResponseOf(responses, eventId, me?.id); }
 async function respond(eventId, status) {
@@ -345,7 +345,7 @@ async function respond(eventId, status) {
     }
     render();
     publish("emergency.checkin_responded", { event_id: eventId, status });
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError("Couldn’t save your response — try again."); }
 }
 
 /* ── render ── */

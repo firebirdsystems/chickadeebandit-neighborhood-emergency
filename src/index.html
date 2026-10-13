@@ -249,7 +249,14 @@ async function submitResource(form) {
 }
 async function deleteResource(id) {
   if (!(await hubConfirm({ message: "Remove this from the registry?", destructive: true, confirmLabel: "Remove" }))) return;
-  try { if (DB) await db("DELETE FROM app_neighborhood_emergency__resources WHERE id=?", [id]); resources = resources.filter(x => x.id !== id); render(); }
+  try {
+    if (DB) {
+      // A delete the hub refuses answers 200 with nothing changed; so does one for a row already gone.
+      const { changed } = await db("DELETE FROM app_neighborhood_emergency__resources WHERE id=?", [id]);
+      if (changed === 0) { await loadData(); return resources.some(x => x.id === id) ? showError("That could not be removed from the registry.") : render(); }
+    }
+    resources = resources.filter(x => x.id !== id); render();
+  }
   catch (e) { console.error(e); showError("Couldn’t remove that from the registry — try again."); }
 }
 
@@ -277,8 +284,12 @@ async function submitContact(form) {
   try {
     if (id) {
       const c = contacts.find(x => x.id === id);
-      if (DB) await db("UPDATE app_neighborhood_emergency__contacts SET name=?, role=?, phone=?, area=?, notes=? WHERE id=?", [vals.name, vals.role, vals.phone, vals.area, vals.notes, id]);
-      Object.assign(c, vals);
+      if (DB) {
+        // A refused save answers 200 with nothing changed: the form stays open as typed.
+        const { changed } = await db("UPDATE app_neighborhood_emergency__contacts SET name=?, role=?, phone=?, area=?, notes=? WHERE id=?", [vals.name, vals.role, vals.phone, vals.area, vals.notes, id]);
+        if (changed === 0) { await loadData(); btn.disabled = false; btn.textContent = "Save"; return showError(contacts.some(x => x.id === id) ? "That contact could not be saved." : "That contact has been removed."); }
+      }
+      if (c) Object.assign(c, vals);
     } else {
       const row = { id: uid("c"), ...vals, sort_order: contacts.length, created_at: nowIso() };
       if (DB) await db("INSERT INTO app_neighborhood_emergency__contacts (id, name, role, phone, area, notes, sort_order, created_at) VALUES (?,?,?,?,?,?,?,?)",
@@ -290,7 +301,13 @@ async function submitContact(form) {
 }
 async function deleteContact(id) {
   if (!(await hubConfirm({ message: "Remove this contact?", destructive: true, confirmLabel: "Remove" }))) return;
-  try { if (DB) await db("DELETE FROM app_neighborhood_emergency__contacts WHERE id=?", [id]); contacts = contacts.filter(x => x.id !== id); render(); }
+  try {
+    if (DB) {
+      const { changed } = await db("DELETE FROM app_neighborhood_emergency__contacts WHERE id=?", [id]);
+      if (changed === 0) { await loadData(); return contacts.some(x => x.id === id) ? showError("That contact could not be removed.") : render(); }
+    }
+    contacts = contacts.filter(x => x.id !== id); render();
+  }
   catch (e) { console.error(e); showError("Couldn’t remove the contact — try again."); }
 }
 
@@ -335,7 +352,11 @@ async function respond(eventId, status) {
   const existing = myResponse(eventId);
   try {
     if (existing) {
-      if (DB) await db("UPDATE app_neighborhood_emergency__checkin_responses SET status=?, responded_at=? WHERE id=?", [status, nowIso(), existing.id]);
+      if (DB) {
+        // Nothing changed: re-read so the screen shows what is stored; the next tap starts from that.
+        const { changed } = await db("UPDATE app_neighborhood_emergency__checkin_responses SET status=?, responded_at=? WHERE id=?", [status, nowIso(), existing.id]);
+        if (changed === 0) { await loadData(); return showError("Your response could not be saved — tap again."); }
+      }
       existing.status = status; existing.responded_at = nowIso();
     } else {
       const row = { id: uid("rs"), event_id: eventId, member_id: me.id, member_name: me.name, status, note: "", responded_at: nowIso() };

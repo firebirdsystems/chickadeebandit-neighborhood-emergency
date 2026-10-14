@@ -88,6 +88,7 @@ import { esc, isAdult, memberColor, initial, hubConfirm, formatRelativeDate, sen
 import {
   STATUSES, statusOf, isCoordinator as isCoordinatorOf, seesAllResponses as seesAllResponsesOf,
   activeEvent as activeEventOf, myResponse as myResponseOf, countStatuses, resourcesByKind, searchableFields,
+  failureLine, unchangedLine,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -122,7 +123,7 @@ async function db(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql, params }) });
   const json = await res.json().catch(() => null);
-  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "That could not be saved");
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw Object.assign(new Error(json?.error || "That could not be saved"), { status: res.ok ? undefined : res.status, code: json?.code });
   return json;
 }
 
@@ -181,7 +182,7 @@ async function loadData() {
 async function saveSetting(key, value) {
   if (!ADMIN_CONFIG_URL) { coordinatorGroupId = value || null; return; }
   const res = await fetch(ADMIN_CONFIG_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, value }) });
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Save failed");
+  if (!res.ok) { const body = await res.json().catch(() => ({})); throw Object.assign(new Error(body?.error ?? "Save failed"), { status: res.status, code: body?.code }); }
 }
 
 function settingsModal() {
@@ -203,7 +204,7 @@ async function submitSettings(form) {
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
   clearFormError();
   try { await saveSetting("coordinator_group_id", groupId); coordinatorGroupId = groupId || null; error = ""; closeDialog(dlg); render(); }
-  catch (e) { btn.disabled = false; btn.textContent = "Save"; console.error(e); showFormError("Couldn’t save the coordinator group — try again.", dlg); }
+  catch (e) { btn.disabled = false; btn.textContent = "Save"; console.error(e); showFormError(failureLine(e, { action: "save the coordinator group", thing: "setting" }), dlg); }
 }
 
 async function init() {
@@ -266,7 +267,7 @@ async function submitResource(form) {
     if (DB) await db("INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?,?,?,?,?,?,?,?)",
       [row.id, row.member_id, row.member_name, row.kind, row.label, row.detail, row.visibility, row.created_at]);
     resources = [...resources, row]; error = ""; closeDialog(dlg); render();
-  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; console.error(e); showFormError("Couldn’t add that to the registry — try again.", dlg); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; console.error(e); showFormError(failureLine(e, { action: "add that to the registry", thing: "registry entry" }), dlg); }
 }
 async function deleteResource(id) {
   if (!(await hubConfirm({ message: "Remove this from the registry?", destructive: true, confirmLabel: "Remove" }))) return;
@@ -274,11 +275,11 @@ async function deleteResource(id) {
     if (DB) {
       // A delete the hub refuses answers 200 with nothing changed; so does one for a row already gone.
       const { changed } = await db("DELETE FROM app_neighborhood_emergency__resources WHERE id=?", [id]);
-      if (changed === 0) { await loadData(); return resources.some(x => x.id === id) ? showError("That could not be removed from the registry.") : (error = "", render()); }
+      if (changed === 0) { await loadData(); return resources.some(x => x.id === id) ? showError(unchangedLine(true, { action: "remove that from the registry", thing: "registry entry" })) : (error = "", render()); }
     }
     resources = resources.filter(x => x.id !== id); error = ""; render();
   }
-  catch (e) { console.error(e); showError("Couldn’t remove that from the registry — try again."); }
+  catch (e) { console.error(e); showError(failureLine(e, { action: "remove that from the registry", thing: "registry entry" })); }
 }
 
 /* ── contacts (phone tree) ── */
@@ -311,7 +312,7 @@ async function submitContact(form) {
       if (DB) {
         // A refused save answers 200 with nothing changed: the form stays open as typed.
         const { changed } = await db("UPDATE app_neighborhood_emergency__contacts SET name=?, role=?, phone=?, area=?, notes=? WHERE id=?", [vals.name, vals.role, vals.phone, vals.area, vals.notes, id]);
-        if (changed === 0) { await loadData(); btn.disabled = false; btn.textContent = "Save"; return showFormError(contacts.some(x => x.id === id) ? "That contact could not be saved." : "That contact has been removed.", dlg); }
+        if (changed === 0) { await loadData(); btn.disabled = false; btn.textContent = "Save"; return showFormError(unchangedLine(contacts.some(x => x.id === id), { action: "save the contact", thing: "contact" }), dlg); }
       }
       if (c) Object.assign(c, vals);
     } else {
@@ -321,18 +322,18 @@ async function submitContact(form) {
       contacts = [...contacts, row];
     }
     error = ""; closeDialog(dlg); render();
-  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; console.error(e); showFormError("Couldn’t save the contact — try again.", dlg); }
+  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; console.error(e); showFormError(failureLine(e, { action: "save the contact", thing: "contact" }), dlg); }
 }
 async function deleteContact(id) {
   if (!(await hubConfirm({ message: "Remove this contact?", destructive: true, confirmLabel: "Remove" }))) return;
   try {
     if (DB) {
       const { changed } = await db("DELETE FROM app_neighborhood_emergency__contacts WHERE id=?", [id]);
-      if (changed === 0) { await loadData(); return contacts.some(x => x.id === id) ? showError("That contact could not be removed.") : (error = "", render()); }
+      if (changed === 0) { await loadData(); return contacts.some(x => x.id === id) ? showError(unchangedLine(true, { action: "remove the contact", thing: "contact" })) : (error = "", render()); }
     }
     contacts = contacts.filter(x => x.id !== id); error = ""; render();
   }
-  catch (e) { console.error(e); showError("Couldn’t remove the contact — try again."); }
+  catch (e) { console.error(e); showError(failureLine(e, { action: "remove the contact", thing: "contact" })); }
 }
 
 /* ── storm mode ── */
@@ -360,7 +361,7 @@ async function submitStorm(form) {
     events = [row, ...events]; error = ""; closeDialog(dlg); render();
     publish("emergency.storm_activated", { event_id: row.id, title: row.title });
     sendHubNotification({ title: `🚨 ${row.title}`, body: row.message || "Tap to check in — are you OK?", url: hubAppUrl(APP_ID, { eventId: row.id }) }).catch(() => {});
-  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; console.error(e); showFormError("Couldn’t start the check-in — try again.", dlg); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; console.error(e); showFormError(failureLine(e, { action: "start the check-in", thing: "check-in" }), dlg); }
 }
 async function closeStorm(id) {
   if (!(await hubConfirm({ message: "Close this check-in?", description: "Responses are kept for the record.", confirmLabel: "Close" }))) return;
@@ -368,10 +369,10 @@ async function closeStorm(id) {
     if (DB) {
       // Only a coordinator's write reaches the row; anyone else's changes nothing.
       const { changed } = await db("UPDATE app_neighborhood_emergency__checkin_events SET active=0, closed_at=? WHERE id=?", [nowIso(), id]);
-      if (changed === 0) { await loadData(); return showError("This check-in could not be closed."); }
+      if (changed === 0) { await loadData(); return showError(unchangedLine(events.some(x => x.id === id), { action: "close the check-in", thing: "check-in" })); }
     }
     const e = events.find(x => x.id === id); if (e) { e.active = 0; e.closed_at = nowIso(); } error = ""; render();
-  } catch (e) { console.error(e); showError("Couldn’t close the check-in — try again."); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "close the check-in", thing: "check-in" })); }
 }
 function myResponse(eventId) { return myResponseOf(responses, eventId, me?.id); }
 let responding = false; // one response write at a time: a second tap before the first INSERT answers would add a second row
@@ -384,7 +385,7 @@ async function respond(eventId, status) {
       if (DB) {
         // Nothing changed: re-read so the screen shows what is stored; the next tap starts from that.
         const { changed } = await db("UPDATE app_neighborhood_emergency__checkin_responses SET status=?, responded_at=? WHERE id=?", [status, nowIso(), existing.id]);
-        if (changed === 0) { await loadData(); return showError("Your response could not be saved — tap again."); }
+        if (changed === 0) { await loadData(); return showError(unchangedLine(responses.some(x => x.id === existing.id), { action: "save your response", thing: "response" })); }
       }
       existing.status = status; existing.responded_at = nowIso();
     } else {
@@ -395,7 +396,7 @@ async function respond(eventId, status) {
     }
     error = ""; render();
     publish("emergency.checkin_responded", { event_id: eventId, status });
-  } catch (e) { console.error(e); showError("Couldn’t save your response — try again."); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "save your response", thing: "response" })); }
   finally { responding = false; }
 }
 

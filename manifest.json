@@ -48,13 +48,7 @@
           "settings_key": "coordinator_group_id",
           "actions": ["select", "insert", "update", "delete"]
         }
-      ],
-      "retain_days": {
-        "default": 90,
-        "timestamp_column": "created_at",
-        "override_key": "checkin_history",
-        "dependent_tables": [{ "table": "checkin_responses", "foreign_key": "event_id" }]
-      }
+      ]
     },
     "checkin_responses": {
       "kind": "owner_only",
@@ -66,6 +60,14 @@
         "scope_columns": ["event_id"],
         "limit": 1
       }
+    }
+  },
+  "retention": {
+    "checkin_events": {
+      "default": 90,
+      "timestamp_column": "created_at",
+      "override_key": "checkin_history",
+      "dependent_tables": [{ "table": "checkin_responses", "foreign_key": "event_id" }]
     }
   },
   "publishes": ["emergency.storm_activated", "emergency.checkin_responded"],
@@ -96,8 +98,5 @@
       "query": "SELECT COUNT(*) AS n FROM app_neighborhood_emergency__checkin_events WHERE active = 1 LIMIT 1"
     },
     "display": { "template": "badge", "count": "n", "label": "storm check-in active", "severity": "alert" }
-  },
-  "resource_limits": {
-    "max_db_bytes": 26214400
   }
 }

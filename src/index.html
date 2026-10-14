@@ -193,14 +193,17 @@ function settingsModal() {
       <div class="field"><label for="set-group">Coordinator group</label>
         <select id="set-group">${groups.length ? `<option value="">— None —</option>${opts}` : `<option value="">No hub groups exist yet</option>`}</select></div>
       ${groups.length ? "" : `<p class="tiny" style="color:var(--amber)">Create a group in the hub's family/group settings first, then return here.</p>`}
+      ${FORM_ERROR}
       <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">Save</button></div>
     </form>`);
 }
 async function submitSettings(form) {
   const groupId = form["set-group"].value;
+  const dlg = modalEl;
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
-  try { await saveSetting("coordinator_group_id", groupId); coordinatorGroupId = groupId || null; error = ""; closeModal(); render(); }
-  catch (e) { btn.disabled = false; btn.textContent = "Save"; console.error(e); showError("Couldn’t save the coordinator group — try again."); }
+  clearFormError();
+  try { await saveSetting("coordinator_group_id", groupId); coordinatorGroupId = groupId || null; error = ""; closeDialog(dlg); render(); }
+  catch (e) { btn.disabled = false; btn.textContent = "Save"; console.error(e); showFormError("Couldn’t save the coordinator group — try again.", dlg); }
 }
 
 async function init() {
@@ -212,6 +215,19 @@ function publish(type, payload) {
   fetch(EVENTS_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ source_app_id: APP_ID, type, payload }) }).catch(() => {});
 }
 function showError(msg) { error = msg; render(); }
+// The page's own error line sits behind the backdrop while a form is open, so
+// a form's failure is reported inside it. With no form open it goes to the page.
+// `dlg` is the dialog that submitted: once it is cancelled or replaced, its
+// failure goes to the page, never into a dialog opened since.
+function showFormError(msg, dlg = modalEl) {
+  const el = dlg && dlg === modalEl ? dlg.querySelector(".modal-error") : null;
+  if (!el) return showError(msg);
+  el.textContent = msg;
+  el.hidden = !msg;
+  render(); // a refused save re-read the lists; the page behind shows them
+}
+function clearFormError() { const el = modalEl?.querySelector(".modal-error"); if (el) { el.textContent = ""; el.hidden = true; } }
+const FORM_ERROR = `<div class="error modal-error" data-testid="form-error" role="alert" hidden></div>`;
 function avatar(id, name) { return `<span class="avatar" style="background:${esc(memberColor(id, members))}">${esc(initial(name))}</span>`; }
 
 /* ── modal ── */
@@ -225,6 +241,8 @@ function openModal(html) {
   const f = modalEl.querySelector("[data-autofocus]"); if (f) f.focus();
 }
 function closeModal() { modalEl?.remove(); modalEl = null; }
+// Close the dialog that submitted, only if it is still the open one.
+function closeDialog(dlg) { if (dlg === modalEl) closeModal(); }
 
 /* ── resources ── */
 function resourceModal() {
@@ -234,18 +252,21 @@ function resourceModal() {
       <div class="field"><label for="r-kind">Type</label><select id="r-kind"><option value="equipment">Equipment</option><option value="skill">Skill / training</option></select></div>
       <div class="field"><label for="r-label">What is it?</label><input id="r-label" data-autofocus placeholder="e.g. Generator, chainsaw, CPR certified"></div>
       <div class="field"><label for="r-detail">Details</label><textarea id="r-detail" placeholder="Anything neighbors should know before they call"></textarea></div>
+      ${FORM_ERROR}
       <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">Add to registry</button></div>
     </form>`);
 }
 async function submitResource(form) {
   const label = form["r-label"].value.trim(); if (!label) { form["r-label"].focus(); return; }
+  const dlg = modalEl;
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
+  clearFormError();
   const row = { id: uid("r"), member_id: me.id, member_name: me.name, kind: form["r-kind"].value, label, detail: form["r-detail"].value.trim(), visibility: "everyone", created_at: nowIso() };
   try {
     if (DB) await db("INSERT INTO app_neighborhood_emergency__resources (id, member_id, member_name, kind, label, detail, visibility, created_at) VALUES (?,?,?,?,?,?,?,?)",
       [row.id, row.member_id, row.member_name, row.kind, row.label, row.detail, row.visibility, row.created_at]);
-    resources = [...resources, row]; error = ""; closeModal(); render();
-  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; console.error(e); showError("Couldn’t add that to the registry — try again."); }
+    resources = [...resources, row]; error = ""; closeDialog(dlg); render();
+  } catch (e) { btn.disabled = false; btn.textContent = "Add to registry"; console.error(e); showFormError("Couldn’t add that to the registry — try again.", dlg); }
 }
 async function deleteResource(id) {
   if (!(await hubConfirm({ message: "Remove this from the registry?", destructive: true, confirmLabel: "Remove" }))) return;
@@ -273,13 +294,16 @@ function contactModal(id) {
       </div>
       <div class="field"><label for="c-area">Area covered</label><input id="c-area" placeholder="Houses 1–20, whole block" value="${c ? esc(c.area) : ""}"></div>
       <div class="field"><label for="c-notes">Notes</label><input id="c-notes" value="${c ? esc(c.notes) : ""}"></div>
+      ${FORM_ERROR}
       <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn">${c ? "Save" : "Add"}</button></div>
     </form>`);
 }
 async function submitContact(form) {
   const name = form["c-name"].value.trim(); if (!name) { form["c-name"].focus(); return; }
   const id = form.dataset.id;
+  const dlg = modalEl;
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Saving…";
+  clearFormError();
   const vals = { name, role: form["c-role"].value.trim(), phone: form["c-phone"].value.trim(), area: form["c-area"].value.trim(), notes: form["c-notes"].value.trim() };
   try {
     if (id) {
@@ -287,7 +311,7 @@ async function submitContact(form) {
       if (DB) {
         // A refused save answers 200 with nothing changed: the form stays open as typed.
         const { changed } = await db("UPDATE app_neighborhood_emergency__contacts SET name=?, role=?, phone=?, area=?, notes=? WHERE id=?", [vals.name, vals.role, vals.phone, vals.area, vals.notes, id]);
-        if (changed === 0) { await loadData(); btn.disabled = false; btn.textContent = "Save"; return showError(contacts.some(x => x.id === id) ? "That contact could not be saved." : "That contact has been removed."); }
+        if (changed === 0) { await loadData(); btn.disabled = false; btn.textContent = "Save"; return showFormError(contacts.some(x => x.id === id) ? "That contact could not be saved." : "That contact has been removed.", dlg); }
       }
       if (c) Object.assign(c, vals);
     } else {
@@ -296,8 +320,8 @@ async function submitContact(form) {
         [row.id, row.name, row.role, row.phone, row.area, row.notes, row.sort_order, row.created_at]);
       contacts = [...contacts, row];
     }
-    error = ""; closeModal(); render();
-  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; console.error(e); showError("Couldn’t save the contact — try again."); }
+    error = ""; closeDialog(dlg); render();
+  } catch (e) { btn.disabled = false; btn.textContent = id ? "Save" : "Add"; console.error(e); showFormError("Couldn’t save the contact — try again.", dlg); }
 }
 async function deleteContact(id) {
   if (!(await hubConfirm({ message: "Remove this contact?", destructive: true, confirmLabel: "Remove" }))) return;
@@ -320,20 +344,23 @@ function stormModal() {
     <form class="form" id="storm-form">
       <div class="field"><label for="s-title">Headline</label><input id="s-title" data-autofocus value="Storm check-in" placeholder="e.g. Ice storm — everyone OK?"></div>
       <div class="field"><label for="s-msg">Message</label><textarea id="s-msg" placeholder="Tap to tell us how you're doing.">Tap to tell us how you're doing.</textarea></div>
+      ${FORM_ERROR}
       <div class="modal-actions"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-danger">Broadcast</button></div>
     </form>`);
 }
 async function submitStorm(form) {
   const title = form["s-title"].value.trim() || "Storm check-in";
+  const dlg = modalEl;
   const btn = modalEl.querySelector(".btn[type=submit]"); btn.disabled = true; btn.textContent = "Broadcasting…";
+  clearFormError();
   const row = { id: uid("e"), title, message: form["s-msg"].value.trim(), active: 1, created_by: me.id, created_by_name: me.name, created_at: nowIso(), closed_at: "" };
   try {
     if (DB) await db("INSERT INTO app_neighborhood_emergency__checkin_events (id, title, message, active, created_by, created_by_name, created_at, closed_at) VALUES (?,?,?,?,?,?,?,?)",
       [row.id, row.title, row.message, 1, row.created_by, row.created_by_name, row.created_at, ""]);
-    events = [row, ...events]; error = ""; closeModal(); render();
+    events = [row, ...events]; error = ""; closeDialog(dlg); render();
     publish("emergency.storm_activated", { event_id: row.id, title: row.title });
     sendHubNotification({ title: `🚨 ${row.title}`, body: row.message || "Tap to check in — are you OK?", url: hubAppUrl(APP_ID, { eventId: row.id }) }).catch(() => {});
-  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; console.error(e); showError("Couldn’t start the check-in — try again."); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Broadcast"; console.error(e); showFormError("Couldn’t start the check-in — try again.", dlg); }
 }
 async function closeStorm(id) {
   if (!(await hubConfirm({ message: "Close this check-in?", description: "Responses are kept for the record.", confirmLabel: "Close" }))) return;

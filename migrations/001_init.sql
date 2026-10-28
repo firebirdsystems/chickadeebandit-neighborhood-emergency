@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__settings (
 );
 
 CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__resources (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   member_id TEXT NOT NULL,
   member_name TEXT NOT NULL,
   kind TEXT NOT NULL DEFAULT 'equipment',
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__resources (
 );
 
 CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__contacts (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   role TEXT DEFAULT '',
   phone TEXT DEFAULT '',
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__contacts (
 );
 
 CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__checkin_events (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
   message TEXT DEFAULT '',
   active INTEGER NOT NULL DEFAULT 1,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__checkin_events (
 );
 
 CREATE TABLE IF NOT EXISTS app_neighborhood_emergency__checkin_responses (
-  id TEXT PRIMARY KEY,
+  id TEXT NOT NULL PRIMARY KEY,
   event_id TEXT NOT NULL,
   member_id TEXT NOT NULL,
   member_name TEXT NOT NULL,
